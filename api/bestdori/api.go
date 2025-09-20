@@ -32,6 +32,7 @@ func (e *RequestFiledError) Error() string {
 func NewBestdoriAPI(proxyURL string, timeout int) *api.API {
 	api := api.NewAPI("https://bestdori.com", proxyURL, timeout)
 	api.OnBeforeRequest(onBeforeRequest)
+	api.OnAfterResponse(api.ContentTypeMiddleware())
 	api.OnAfterResponse(onAfterResponse)
 	return api
 }
