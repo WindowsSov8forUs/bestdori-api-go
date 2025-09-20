@@ -115,12 +115,19 @@ func (api *API) get(endpoint string, params map[string]string, value any) (*rest
 		return nil, err
 	}
 
-	response, err := req.SetResult(&value).Get(endpoint)
-	if err != nil {
-		return nil, err
+	if _, ok := value.(*[]byte); ok {
+		response, err := req.Get(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
+	} else {
+		response, err := req.SetResult(&value).Get(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
 	}
-
-	return response, nil
 }
 
 func (api *API) post(endpoint string, data any, files FilesFormData, value any) (*resty.Response, error) {
@@ -139,9 +146,13 @@ func (api *API) post(endpoint string, data any, files FilesFormData, value any) 
 
 func Get[T any](api *API, endpoint string, params map[string]string) (*T, error) {
 	var result T
-	_, err := api.get(endpoint, params, &result)
+	resp, err := api.get(endpoint, params, &result)
 	if err != nil {
 		return nil, err
+	}
+	if _, ok := any(&result).(*[]byte); ok {
+		*any(&result).(*[]byte) = resp.Body()
+		return &result, nil
 	}
 	return &result, nil
 }
