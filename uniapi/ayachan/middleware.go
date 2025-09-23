@@ -3,7 +3,7 @@ package ayachan
 import (
 	"encoding/json"
 
-	"github.com/WindowsSov8forUs/bestdori-api-go/api"
+	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -16,9 +16,9 @@ func onAfterResponse(client *resty.Client, response *resty.Response) error {
 			return err
 		}
 		return &AyachanResponseError{
-			ResponseError: &api.ResponseError{Response: response},
+			ResponseError: &uniapi.ResponseError{Response: response},
 			ErrorInfo:     resp.Error,
 		}
 	}
-	return api.RaiseForStatus(response)
+	return uniapi.RaiseForStatus(response)
 }

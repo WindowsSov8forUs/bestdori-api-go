@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/WindowsSov8forUs/bestdori-api-go/api"
+	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -22,7 +22,7 @@ func onAfterResponse(client *resty.Client, response *resty.Response) error {
 		// 检查 Content-Type
 		contentType := response.Header().Get("Content-Type")
 		if !strings.Contains(contentType, "application/json") {
-			return api.RaiseForStatus(response)
+			return uniapi.RaiseForStatus(response)
 		}
 
 		// 解析通用响应体
@@ -32,23 +32,23 @@ func onAfterResponse(client *resty.Client, response *resty.Response) error {
 		}
 		if resp.Result == nil {
 			if response.IsError() {
-				return &api.ResponseStatusError{Response: response}
+				return &uniapi.ResponseStatusError{Response: response}
 			}
 			return nil
 		} else if !*resp.Result {
 			code := resp.Code
 			return &RequestFiledError{
-				ResponseError: &api.ResponseError{Response: response},
+				ResponseError: &uniapi.ResponseError{Response: response},
 				Code:          code,
 			}
 		}
-		return api.RaiseForStatus(response)
+		return uniapi.RaiseForStatus(response)
 	} else if strings.Contains(response.Request.URL, "/assets/") || strings.Contains(response.Request.URL, "/res/") {
 		// 检查 Content-Type
 		if strings.Contains(response.Header().Get("Content-Type"), "text/html") {
 			return &AssetsNotExistError{Response: response}
 		}
-		return api.RaiseForStatus(response)
+		return uniapi.RaiseForStatus(response)
 	}
-	return api.RaiseForStatus(response)
+	return uniapi.RaiseForStatus(response)
 }

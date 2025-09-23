@@ -3,7 +3,7 @@ package ayachan
 import (
 	"fmt"
 
-	"github.com/WindowsSov8forUs/bestdori-api-go/api"
+	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
 type AyachanAPIResponse struct {
@@ -11,7 +11,7 @@ type AyachanAPIResponse struct {
 }
 
 type AyachanResponseError struct {
-	*api.ResponseError
+	*uniapi.ResponseError
 	ErrorInfo string
 }
 
@@ -22,8 +22,8 @@ func (e *AyachanResponseError) Error() string {
 	return fmt.Sprintf("ayachan responsed an error: %s", e.ErrorInfo)
 }
 
-func NewAyachanAPI(proxyURL string, timeout int) *api.API {
-	api := api.NewAPI("https://api.ayachan.fun", proxyURL, timeout)
+func NewAyachanAPI(proxyURL string, timeout int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://api.ayachan.fun", proxyURL, timeout)
 	api.OnAfterResponse(onAfterResponse)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api

@@ -3,7 +3,7 @@ package sonolus
 import (
 	"fmt"
 
-	"github.com/WindowsSov8forUs/bestdori-api-go/api"
+	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
 type SonolusAPIResponse struct {
@@ -13,7 +13,7 @@ type SonolusAPIResponse struct {
 }
 
 type SonolusResponseError struct {
-	*api.ResponseError
+	*uniapi.ResponseError
 	Code        string
 	Description string
 	Detail      string
@@ -27,8 +27,8 @@ func (e *SonolusResponseError) Error() string {
 	return fmt.Sprintf("sonolus ayachan server responsed an error: `%s`", e.errorInfo())
 }
 
-func NewSonolusAPI(proxyURL string, timeout int) *api.API {
-	api := api.NewAPI("https://sonolus.ayachan.fun", proxyURL, timeout)
+func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://sonolus.ayachan.fun", proxyURL, timeout)
 	api.OnAfterResponse(onAfterResponse)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api

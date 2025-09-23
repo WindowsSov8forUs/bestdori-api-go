@@ -1,4 +1,4 @@
-package api
+package uniapi
 
 import (
 	"fmt"
@@ -46,12 +46,12 @@ func (e *NoContentTypeError) Error() string {
 	return "got unexpected empty Content-Type"
 }
 
-type API struct {
+type UniAPI struct {
 	baseURL string
 	client  *resty.Client
 }
 
-func NewAPI(url, proxyURL string, timeout int) *API {
+func NewAPI(url, proxyURL string, timeout int) *UniAPI {
 	client := resty.New().
 		SetBaseURL(url).
 		SetProxy(proxyURL).
@@ -64,21 +64,21 @@ func NewAPI(url, proxyURL string, timeout int) *API {
 	})
 	client.SetCookieJar(jar)
 
-	return &API{
+	return &UniAPI{
 		baseURL: url,
 		client:  client,
 	}
 }
 
-func (api *API) OnAfterResponse(f resty.ResponseMiddleware) {
+func (api *UniAPI) OnAfterResponse(f resty.ResponseMiddleware) {
 	api.client.OnAfterResponse(f)
 }
 
-func (api *API) OnBeforeRequest(f resty.RequestMiddleware) {
+func (api *UniAPI) OnBeforeRequest(f resty.RequestMiddleware) {
 	api.client.OnBeforeRequest(f)
 }
 
-func (api *API) ContentTypeMiddleware() resty.ResponseMiddleware {
+func (api *UniAPI) ContentTypeMiddleware() resty.ResponseMiddleware {
 	return func(c *resty.Client, r *resty.Response) error {
 		contentType := r.Header().Get("Content-Type")
 		if contentType == "" {
@@ -88,7 +88,7 @@ func (api *API) ContentTypeMiddleware() resty.ResponseMiddleware {
 	}
 }
 
-func (api *API) buildRequest(params map[string]string, data any, files FilesFormData) (*resty.Request, error) {
+func (api *UniAPI) buildRequest(params map[string]string, data any, files FilesFormData) (*resty.Request, error) {
 	req := api.client.R()
 
 	// 设置请求参数
@@ -109,7 +109,7 @@ func (api *API) buildRequest(params map[string]string, data any, files FilesForm
 	return req, nil
 }
 
-func (api *API) get(endpoint string, params map[string]string, value any) (*resty.Response, error) {
+func (api *UniAPI) get(endpoint string, params map[string]string, value any) (*resty.Response, error) {
 	req, err := api.buildRequest(params, nil, nil)
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (api *API) get(endpoint string, params map[string]string, value any) (*rest
 	}
 }
 
-func (api *API) post(endpoint string, data any, files FilesFormData, value any) (*resty.Response, error) {
+func (api *UniAPI) post(endpoint string, data any, files FilesFormData, value any) (*resty.Response, error) {
 	req, err := api.buildRequest(nil, data, files)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (api *API) post(endpoint string, data any, files FilesFormData, value any) 
 	return response, nil
 }
 
-func Get[T any](api *API, endpoint string, params map[string]string) (*T, error) {
+func Get[T any](api *UniAPI, endpoint string, params map[string]string) (*T, error) {
 	var result T
 	resp, err := api.get(endpoint, params, &result)
 	if err != nil {
@@ -157,7 +157,7 @@ func Get[T any](api *API, endpoint string, params map[string]string) (*T, error)
 	return &result, nil
 }
 
-func Post[T any](api *API, endpoint string, data any, files FilesFormData) (*T, error) {
+func Post[T any](api *UniAPI, endpoint string, data any, files FilesFormData) (*T, error) {
 	var result T
 	_, err := api.post(endpoint, data, files, &result)
 	if err != nil {

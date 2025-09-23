@@ -3,7 +3,7 @@ package sonolus
 import (
 	"encoding/json"
 
-	"github.com/WindowsSov8forUs/bestdori-api-go/api"
+	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -16,11 +16,11 @@ func onAfterResponse(client *resty.Client, response *resty.Response) error {
 			return err
 		}
 		return &SonolusResponseError{
-			ResponseError: &api.ResponseError{Response: response},
+			ResponseError: &uniapi.ResponseError{Response: response},
 			Code:          resp.Code,
 			Description:   resp.Description,
 			Detail:        resp.Detail,
 		}
 	}
-	return api.RaiseForStatus(response)
+	return uniapi.RaiseForStatus(response)
 }
