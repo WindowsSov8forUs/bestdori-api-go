@@ -8,5 +8,8 @@ const (
 
 	ThumbChara = "/assets/%s/thumb/chara/card%05d_rip/%s_%s.png"
 
+	ComicComic     = "/assets/%s/comic/comic_%s/%s_rip/%s.png"
+	ComicThumbnail = "/assets/%s/comic/comic_%s_thumbnail/%s_rip/%s.png"
+
 	BandLogo = "/assets/%s/band/logo/%03d_rip/%s.png"
 )

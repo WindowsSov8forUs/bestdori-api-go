@@ -13,4 +13,6 @@ const (
 
 	CardsInfo = "/api/cards/%d.json"
 	CardsAll  = "/api/cards/all.%d.json"
+
+	ComicsAll = "/api/comics/all.%d.json"
 )
