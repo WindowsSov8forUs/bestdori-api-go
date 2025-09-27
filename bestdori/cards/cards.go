@@ -5,6 +5,7 @@ import (
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/post"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -97,26 +98,38 @@ func (c *Card) Names() []*string {
 	return c.Info.Prefix
 }
 
-func (c *Card) DefaultServer() dto.Server {
+func (c *Card) DefaultServer() dto.ServerName {
 	releasedAt := c.Info.ReleasedAt
 	if releasedAt[0] != nil {
-		return dto.ServerJP
+		return dto.ServerNameJP
 	} else if releasedAt[1] != nil {
-		return dto.ServerEN
+		return dto.ServerNameEN
 	} else if releasedAt[2] != nil {
-		return dto.ServerTW
+		return dto.ServerNameTW
 	} else if releasedAt[3] != nil {
-		return dto.ServerCN
+		return dto.ServerNameCN
 	} else if releasedAt[4] != nil {
-		return dto.ServerKR
+		return dto.ServerNameKR
 	} else {
-		return 0
+		return ""
 	}
 }
 
-// GetComment 获取卡牌评论
-func (c *Card) GetComment() (*dto.CardComment, error) {
-	return GetCardComment(c.api, c.Id)
+// GetComments 获取卡牌评论
+func (c *Card) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
+	categoryName := "CARD_COMMENT"
+	categoryId := fmt.Sprintf("%d", c.Id)
+
+	return post.GetList(
+		c.api,
+		nil, nil,
+		&categoryName,
+		&categoryId,
+		nil, nil,
+		order,
+		limit,
+		offset,
+	)
 }
 
 // GetImage 获取卡牌完整图片

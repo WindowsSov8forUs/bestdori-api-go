@@ -7,6 +7,7 @@ import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/post"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -44,20 +45,20 @@ func (c *Comic) Names() []*string {
 	return c.Info.Title
 }
 
-func (c *Comic) DefaultServer() dto.Server {
+func (c *Comic) DefaultServer() dto.ServerName {
 	publicStartAt := c.Info.PublicStartAt
 	if publicStartAt[0] != nil {
-		return dto.ServerJP
+		return dto.ServerNameJP
 	} else if publicStartAt[1] != nil {
-		return dto.ServerEN
+		return dto.ServerNameEN
 	} else if publicStartAt[2] != nil {
-		return dto.ServerTW
+		return dto.ServerNameTW
 	} else if publicStartAt[3] != nil {
-		return dto.ServerCN
+		return dto.ServerNameCN
 	} else if publicStartAt[4] != nil {
-		return dto.ServerKR
+		return dto.ServerNameKR
 	} else {
-		return 0
+		return ""
 	}
 }
 
@@ -68,6 +69,23 @@ func (c *Comic) Type() string {
 	} else {
 		return "singleframe"
 	}
+}
+
+// GetComments 获取漫画评论
+func (c *Comic) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
+	categoryName := "COMIC_COMMENT"
+	categoryId := fmt.Sprintf("%d", c.Id)
+
+	return post.GetList(
+		c.api,
+		nil, nil,
+		&categoryName,
+		&categoryId,
+		nil, nil,
+		order,
+		limit,
+		offset,
+	)
 }
 
 // GetThumbnail 获取漫画缩略图

@@ -1,6 +1,7 @@
 package charts
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"slices"
@@ -18,6 +19,33 @@ type Chart []Note
 func GetChart(api *uniapi.UniAPI, id int, difficulty dto.ChartDifficultyName) (*Chart, error) {
 	endpoint := fmt.Sprintf(endpoints.ChartsInfo, id, difficulty)
 	return uniapi.Get[Chart](api, endpoint, nil)
+}
+
+// UnmarshalSlice 从 []map[string]any 中解析谱面
+func UnmarshalSlice(data []map[string]any) (*Chart, error) {
+	var chart Chart = make(Chart, 0, len(data))
+	for _, item := range data {
+		note, err := unmarshalMap(item)
+		if err != nil {
+			return nil, err
+		}
+		chart = append(chart, *note)
+	}
+	return &chart, nil
+}
+
+// MarshalSlice 将谱面转换为 []map[string]any
+func (c *Chart) MarshalSlice() ([]map[string]any, error) {
+	bytes, err := json.Marshal(c)
+	if err != nil {
+		return nil, err
+	}
+
+	var data []map[string]any
+	if err := json.Unmarshal(bytes, &data); err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (c *Chart) Len() int {

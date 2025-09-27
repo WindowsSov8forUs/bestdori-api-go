@@ -88,12 +88,39 @@ func (api *UniAPI) ContentTypeMiddleware() resty.ResponseMiddleware {
 	}
 }
 
-func (api *UniAPI) buildRequest(params map[string]string, data any, files FilesFormData) (*resty.Request, error) {
+func parseParams(params map[string]any) map[string]string {
+	result := make(map[string]string, len(params))
+	for k, v := range params {
+		if v == nil {
+			continue
+		}
+
+		switch val := v.(type) {
+		case string:
+			params[k] = val
+		case int, int8, int16, int32, int64:
+			params[k] = fmt.Sprintf("%d", val)
+		case uint, uint8, uint16, uint32, uint64:
+			params[k] = fmt.Sprintf("%d", val)
+		case float32, float64:
+			params[k] = fmt.Sprintf("%g", val)
+		case bool:
+			params[k] = fmt.Sprintf("%t", val)
+		case fmt.Stringer:
+			params[k] = val.String()
+		default:
+			params[k] = fmt.Sprintf("%v", val)
+		}
+	}
+	return result
+}
+
+func (api *UniAPI) buildRequest(params map[string]any, data any, files FilesFormData) (*resty.Request, error) {
 	req := api.client.R()
 
 	// 设置请求参数
 	if params != nil {
-		req.SetQueryParams(params)
+		req.SetQueryParams(parseParams(params))
 	}
 
 	// 设置请求体
@@ -109,7 +136,7 @@ func (api *UniAPI) buildRequest(params map[string]string, data any, files FilesF
 	return req, nil
 }
 
-func (api *UniAPI) get(endpoint string, params map[string]string, value any) (*resty.Response, error) {
+func (api *UniAPI) get(endpoint string, params map[string]any, value any) (*resty.Response, error) {
 	req, err := api.buildRequest(params, nil, nil)
 	if err != nil {
 		return nil, err
@@ -144,7 +171,7 @@ func (api *UniAPI) post(endpoint string, data any, files FilesFormData, value an
 	return response, nil
 }
 
-func Get[T any](api *UniAPI, endpoint string, params map[string]string) (*T, error) {
+func Get[T any](api *UniAPI, endpoint string, params map[string]any) (*T, error) {
 	var result T
 	resp, err := api.get(endpoint, params, &result)
 	if err != nil {

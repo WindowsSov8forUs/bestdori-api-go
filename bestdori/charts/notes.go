@@ -3,6 +3,8 @@ package charts
 import (
 	"encoding/json"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 )
 
@@ -24,6 +26,23 @@ type Note struct {
 	Skill       bool              `json:"skill,omitempty"`       // 是否为技能音符
 	Hidden      bool              `json:"hidden,omitempty"`      // 是否为隐藏音符
 	Lane        int               `json:"lane"`                  // 音符所在轨道
+}
+
+func unmarshalMap(data map[string]any) (*Note, error) {
+	var note Note
+	config := &mapstructure.DecoderConfig{
+		TagName:    "json",
+		Result:     &note,
+		ZeroFields: true,
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return nil, err
+	}
+	if err := decoder.Decode(data); err != nil {
+		return nil, err
+	}
+	return &note, nil
 }
 
 func (n *Note) MarshalJSON() ([]byte, error) {

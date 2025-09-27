@@ -13,11 +13,11 @@ type EmptyStruct map[string]struct{}
 type Server int
 
 const (
-	ServerJP Server = 1
-	ServerEN Server = 2
-	ServerTW Server = 3
-	ServerCN Server = 4
-	ServerKR Server = 5
+	ServerJP Server = iota
+	ServerEN
+	ServerTW
+	ServerCN
+	ServerKR
 )
 
 // 服务器名称

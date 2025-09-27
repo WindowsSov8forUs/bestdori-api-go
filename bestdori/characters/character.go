@@ -5,6 +5,7 @@ import (
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/post"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -67,6 +68,23 @@ func GetCharacter(api *uniapi.UniAPI, id int) (*Character, error) {
 
 func (c *Character) Names() []*string {
 	return c.Info.CharacterName
+}
+
+// GetComments 获取角色评论
+func (c *Character) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
+	categoryName := "CHARACTER_COMMENT"
+	categoryId := fmt.Sprintf("%d", c.Id)
+
+	return post.GetList(
+		c.api,
+		nil, nil,
+		&categoryName,
+		&categoryId,
+		nil, nil,
+		order,
+		limit,
+		offset,
+	)
 }
 
 // GetIcon 获取角色图标

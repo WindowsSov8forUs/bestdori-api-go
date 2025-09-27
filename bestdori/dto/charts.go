@@ -20,7 +20,7 @@ const (
 type ChartDifficulty int
 
 const (
-	ChartDifficultyEasy ChartDifficulty = iota + 1
+	ChartDifficultyEasy ChartDifficulty = iota
 	ChartDifficultyNormal
 	ChartDifficultyHard
 	ChartDifficultyExpert

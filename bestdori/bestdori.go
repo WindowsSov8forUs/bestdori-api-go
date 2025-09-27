@@ -2,6 +2,7 @@ package bestdori
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
@@ -41,4 +42,28 @@ func ServerNameToId(serverName dto.ServerName) (dto.Server, error) {
 	default:
 		return 0, fmt.Errorf("unknown server name: %s", serverName)
 	}
+}
+
+func ServerIdToName(serverId dto.Server) (dto.ServerName, error) {
+	switch serverId {
+	case dto.ServerJP:
+		return dto.ServerNameJP, nil
+	case dto.ServerEN:
+		return dto.ServerNameEN, nil
+	case dto.ServerTW:
+		return dto.ServerNameTW, nil
+	case dto.ServerCN:
+		return dto.ServerNameCN, nil
+	case dto.ServerKR:
+		return dto.ServerNameKR, nil
+	default:
+		return "", fmt.Errorf("unknown server id: %d", serverId)
+	}
+}
+
+func RemoveURLPrefix(url string) string {
+	if strings.HasPrefix(url, "https://bestdori.com") {
+		return strings.TrimPrefix(url, "https://bestdori.com")
+	}
+	return url
 }
