@@ -28,6 +28,9 @@ const (
 	FestivalStages         = "/api/festival/stages/%d.json"
 	FestivalRotationMusics = "/api/festival/rotationMusics/%d.json"
 
+	GachaInfo = "/api/gacha/%d.json"
+	GachaAll  = "/api/gacha/all.%d.json"
+
 	SongsInfo = "/api/songs/%d.json"
 	SongsAll  = "/api/songs/all.%d.json"
 

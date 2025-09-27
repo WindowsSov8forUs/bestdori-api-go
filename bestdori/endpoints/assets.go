@@ -20,6 +20,10 @@ const (
 
 	StampGet = "/assets/%s/stamp/01_rip/%s.png"
 
+	HomebannerGet = "/assets/%s/homebanner_rip/%s.png"
+
+	GachaScreen = "/assets/%s/gacha/screen/gacha%d_rip/%s.png"
+
 	ComicComic     = "/assets/%s/comic/comic_%s/%s_rip/%s.png"
 	ComicThumbnail = "/assets/%s/comic/comic_%s_thumbnail/%s_rip/%s.png"
 
