@@ -48,9 +48,10 @@ const (
 	apiTrackerEventTracker = "/api/tracker/data"
 	apiTrackerRates        = "/api/tracker/rates.json"
 
-	apiStampsAll   = "/api/stamps/all."
-	apiArchivesAll = "/api/archives/all."
-	apiComicsAll   = "/api/comics/all."
+	apiStampsAll                 = "/api/stamps/all."
+	apiArchivesAll               = "/api/archives/all."
+	apiMiracleTicketExchangesAll = "/api/miracleTicketExchanges/all."
+	apiComicsAll                 = "/api/comics/all."
 )
 
 // API endpoints functions
@@ -321,6 +322,16 @@ func ArchivesAll(index int) string {
 	defer putBuilder(builder)
 
 	builder.WriteString(apiArchivesAll)
+	builder.WriteString(strconv.Itoa(index))
+	builder.WriteString(json)
+	return builder.String()
+}
+
+func MiracleTicketExchangesAll(index int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiMiracleTicketExchangesAll)
 	builder.WriteString(strconv.Itoa(index))
 	builder.WriteString(json)
 	return builder.String()
