@@ -39,6 +39,9 @@ const (
 	apiLoginCampaignsInfo = "/api/loginCampaigns/"
 	apiLoginCampaignsAll  = "/api/loginCampaigns/all."
 
+	apiMissionsInfo = "/api/missions/"
+	apiMissionsAll  = "/api/missions/all."
+
 	apiBandsAll  = "/api/bands/all."
 	apiBandsMain = "/api/bands/main."
 
@@ -260,6 +263,26 @@ func LoginCampaignsAll(index int) string {
 	defer putBuilder(builder)
 
 	builder.WriteString(apiLoginCampaignsAll)
+	builder.WriteString(strconv.Itoa(index))
+	builder.WriteString(json)
+	return builder.String()
+}
+
+func MissionsInfo(id int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiMissionsInfo)
+	builder.WriteString(strconv.Itoa(id))
+	builder.WriteString(json)
+	return builder.String()
+}
+
+func MissionsAll(index int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiMissionsAll)
 	builder.WriteString(strconv.Itoa(index))
 	builder.WriteString(json)
 	return builder.String()
