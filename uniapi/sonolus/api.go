@@ -1,8 +1,6 @@
 package sonolus
 
 import (
-	"fmt"
-
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -20,11 +18,11 @@ type SonolusResponseError struct {
 }
 
 func (e *SonolusResponseError) errorInfo() string {
-	return fmt.Sprintf("code: %s, description: %s, detail: %s", e.Code, e.Description, e.Detail)
+	return "code: " + e.Code + ", description: " + e.Description + ", detail: " + e.Detail
 }
 
 func (e *SonolusResponseError) Error() string {
-	return fmt.Sprintf("sonolus ayachan server responsed an error: `%s`", e.errorInfo())
+	return "sonolus ayachan server responsed an error: `" + e.errorInfo() + "`"
 }
 
 func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {

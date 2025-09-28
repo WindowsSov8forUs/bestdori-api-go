@@ -1,7 +1,7 @@
 package eventtop
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
@@ -33,11 +33,11 @@ func GetData(
 	if latest != nil {
 		params["latest"] = *latest
 	}
-	result, err := uniapi.Get[dto.EventTopData](api, endpoints.TrackerEventTop, params)
+	result, err := uniapi.Get[dto.EventTopData](api, endpoints.TrackerEventTop(), params)
 	if err == nil {
 		return result, nil
 	} else if err.(*uniapi.ResponseStatusError).StatusCode() == 404 {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("event %d", event)}
+		return nil, &bestdori.NotExistError{Target: "event " + strconv.Itoa(event)}
 	}
 	return nil, err
 }

@@ -1,7 +1,7 @@
 package comics
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
@@ -13,7 +13,7 @@ import (
 
 // GetAll5 获取总漫画信息
 func GetAll5(api *uniapi.UniAPI) (*dto.ComicsAll5, error) {
-	endpoint := fmt.Sprintf(endpoints.ComicsAll, 5)
+	endpoint := endpoints.ComicsAll(5)
 	return uniapi.Get[dto.ComicsAll5](api, endpoint, nil)
 }
 
@@ -30,9 +30,9 @@ func GetComic(api *uniapi.UniAPI, id int) (*Comic, error) {
 	if err != nil {
 		return nil, err
 	}
-	info, ok := (*all)[fmt.Sprintf("%d", id)]
+	info, ok := (*all)[strconv.Itoa(id)]
 	if !ok {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("comic %d", id)}
+		return nil, &bestdori.NotExistError{Target: "comic " + strconv.Itoa(id)}
 	}
 	return &Comic{
 		Id:   id,
@@ -47,17 +47,18 @@ func (c *Comic) Names() []*string {
 
 func (c *Comic) DefaultServer() dto.ServerName {
 	publicStartAt := c.Info.PublicStartAt
-	if publicStartAt[0] != nil {
+	switch {
+	case publicStartAt[0] != nil:
 		return dto.ServerNameJP
-	} else if publicStartAt[1] != nil {
+	case publicStartAt[1] != nil:
 		return dto.ServerNameEN
-	} else if publicStartAt[2] != nil {
+	case publicStartAt[2] != nil:
 		return dto.ServerNameTW
-	} else if publicStartAt[3] != nil {
+	case publicStartAt[3] != nil:
 		return dto.ServerNameCN
-	} else if publicStartAt[4] != nil {
+	case publicStartAt[4] != nil:
 		return dto.ServerNameKR
-	} else {
+	default:
 		return ""
 	}
 }
@@ -74,7 +75,7 @@ func (c *Comic) Type() string {
 // GetComments 获取漫画评论
 func (c *Comic) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
 	categoryName := "COMIC_COMMENT"
-	categoryId := fmt.Sprintf("%d", c.Id)
+	categoryId := strconv.Itoa(c.Id)
 
 	return post.GetList(
 		c.api,
@@ -91,43 +92,31 @@ func (c *Comic) GetComments(limit, offset int, order post.Order) (*dto.PostList,
 // GetThumbnail 获取漫画缩略图
 func (c *Comic) GetThumbnail(server dto.ServerName) (*[]byte, error) {
 	publicStartAt := c.Info.PublicStartAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if publicStartAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("comic %d", c.Id),
+			Target: "comic " + strconv.Itoa(c.Id),
 			Server: server,
 		}
 	}
 
 	assetBundleName := c.Info.AssetBundleName
-	endpoint := fmt.Sprintf(
-		endpoints.ComicThumbnail,
-		server, c.Type(), assetBundleName, assetBundleName,
-	)
+	endpoint := endpoints.ComicThumbnail(string(server), c.Type(), assetBundleName)
 	return uniapi.Get[[]byte](c.api, endpoint, nil)
 }
 
 // GetAsset 获取漫画资源图片
 func (c *Comic) GetAsset(server dto.ServerName) (*[]byte, error) {
 	publicStartAt := c.Info.PublicStartAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if publicStartAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("comic %d", c.Id),
+			Target: "comic " + strconv.Itoa(c.Id),
 			Server: server,
 		}
 	}
 
 	assetBundleName := c.Info.AssetBundleName
-	endpoint := fmt.Sprintf(
-		endpoints.ComicComic,
-		server, c.Type(), assetBundleName, assetBundleName,
-	)
+	endpoint := endpoints.ComicComic(string(server), c.Type(), assetBundleName)
 	return uniapi.Get[[]byte](c.api, endpoint, nil)
 }

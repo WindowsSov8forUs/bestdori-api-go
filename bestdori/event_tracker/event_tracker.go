@@ -1,7 +1,7 @@
 package eventtracker
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
@@ -13,7 +13,7 @@ import (
 
 // GetRates 获取活动追踪比率数组
 func GetRates(api *uniapi.UniAPI) (*[]dto.EventTrackerRate, error) {
-	return uniapi.Get[[]dto.EventTrackerRate](api, endpoints.TrackerRates, nil)
+	return uniapi.Get[[]dto.EventTrackerRate](api, endpoints.TrackerRates(), nil)
 }
 
 // EventTracker 活动排名追踪器
@@ -35,7 +35,7 @@ func GetEventTracker(api *uniapi.UniAPI, server dto.Server, event int) *EventTra
 // GetComments 获取活动排名追踪评论
 func (et *EventTracker) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
 	categoryName := "EVENTTRACKER_COMMENT"
-	categoryId := fmt.Sprintf("%d", et.Event)
+	categoryId := strconv.Itoa(et.Event)
 
 	return post.GetList(
 		et.api,
@@ -63,11 +63,11 @@ func (et *EventTracker) GetData(tier int) (*dto.EventTrackerData, error) {
 		"event":  et.Event,
 		"tier":   tier,
 	}
-	result, err := uniapi.Get[dto.EventTrackerData](et.api, endpoints.TrackerEventTracker, params)
+	result, err := uniapi.Get[dto.EventTrackerData](et.api, endpoints.TrackerEventTracker(), params)
 	if err == nil {
 		return result, nil
 	} else if err.(*uniapi.ResponseStatusError).StatusCode() == 404 {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("event %d", et.Event)}
+		return nil, &bestdori.NotExistError{Target: "event " + strconv.Itoa(et.Event)}
 	}
 	return nil, err
 }

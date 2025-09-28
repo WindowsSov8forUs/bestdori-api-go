@@ -1,7 +1,7 @@
 package eventarchive
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
@@ -13,7 +13,7 @@ import (
 
 // GetAll5 获取总活动数据信息
 func GetAll5(api *uniapi.UniAPI) (*dto.EventArchiveAll5, error) {
-	endpoint := fmt.Sprintf(endpoints.ArchivesAll, 5)
+	endpoint := endpoints.ArchivesAll(5)
 	return uniapi.Get[dto.EventArchiveAll5](api, endpoint, nil)
 }
 
@@ -30,21 +30,21 @@ func GetEventArchive(api *uniapi.UniAPI, id int) (*EventArchive, error) {
 	if err != nil {
 		return nil, err
 	}
-	if info, ok := (*all)[fmt.Sprintf("%d", id)]; ok {
+	if info, ok := (*all)[strconv.Itoa(id)]; ok {
 		return &EventArchive{
 			Id:   id,
 			Info: &info,
 			api:  api,
 		}, nil
 	} else {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("event archive %d", id)}
+		return nil, &bestdori.NotExistError{Target: "event archive " + strconv.Itoa(id)}
 	}
 }
 
 // GetComments 获取活动数据评论
 func (ea *EventArchive) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
 	categoryName := "EVENTARCHIVE_COMMENT"
-	categoryId := fmt.Sprintf("%d", ea.Id)
+	categoryId := strconv.Itoa(ea.Id)
 
 	return post.GetList(
 		ea.api,

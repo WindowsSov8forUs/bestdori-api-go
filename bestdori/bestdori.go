@@ -2,6 +2,7 @@ package bestdori
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
@@ -14,7 +15,7 @@ type NotExistError struct {
 }
 
 func (e *NotExistError) Error() string {
-	return fmt.Sprintf("%s does not exist", e.Target)
+	return e.Target + " does not exist"
 }
 
 type ServerNotAvailableError struct {
@@ -24,7 +25,7 @@ type ServerNotAvailableError struct {
 }
 
 func (e *ServerNotAvailableError) Error() string {
-	return fmt.Sprintf("%s is not available on server %s", e.Target, e.Server)
+	return e.Target + " is not available on server " + string(e.Server)
 }
 
 func ServerNameToId(serverName dto.ServerName) (dto.Server, error) {
@@ -40,7 +41,7 @@ func ServerNameToId(serverName dto.ServerName) (dto.Server, error) {
 	case dto.ServerNameKR:
 		return dto.ServerKR, nil
 	default:
-		return 0, fmt.Errorf("unknown server name: %s", serverName)
+		return 0, fmt.Errorf("unknown server name: " + string(serverName))
 	}
 }
 
@@ -57,7 +58,7 @@ func ServerIdToName(serverId dto.Server) (dto.ServerName, error) {
 	case dto.ServerKR:
 		return dto.ServerNameKR, nil
 	default:
-		return "", fmt.Errorf("unknown server id: %d", serverId)
+		return "", fmt.Errorf("unknown server id: " + strconv.Itoa(int(serverId)))
 	}
 }
 

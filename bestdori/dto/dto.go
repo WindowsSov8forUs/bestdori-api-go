@@ -2,8 +2,13 @@ package dto
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"time"
+)
+
+var (
+	servers = [...]string{"jp", "en", "tw", "cn", "kr"}
 )
 
 // 空结构体，仅表示字段名存在
@@ -20,6 +25,10 @@ const (
 	ServerKR
 )
 
+func (s Server) Name() ServerName {
+	return ServerName(servers[s])
+}
+
 // 服务器名称
 type ServerName string
 
@@ -30,6 +39,10 @@ const (
 	ServerNameCN ServerName = "cn"
 	ServerNameKR ServerName = "kr"
 )
+
+func (sn ServerName) Id() Server {
+	return Server(sort.SearchStrings(servers[:], string(sn)))
+}
 
 // 时间戳类型，用于处理 Bestdori 的奇异时间戳处理
 type Timestamp struct {

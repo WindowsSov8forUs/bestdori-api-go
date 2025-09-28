@@ -1,7 +1,7 @@
 package post
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/charts"
@@ -40,7 +40,7 @@ func GetList(
 		"limit":        limit,
 		"offset":       offset,
 	}
-	return uniapi.Post[dto.PostList](api, endpoints.PostList, data, nil)
+	return uniapi.Post[dto.PostList](api, endpoints.PostList(), data, nil)
 }
 
 // SearchTags 搜索现有标签
@@ -50,7 +50,7 @@ func SearchTags(api *uniapi.UniAPI, typ, data string, fuzzy bool) (*[]dto.TagRes
 		"data":  data,
 		"fuzzy": fuzzy,
 	}
-	result, err := uniapi.Get[dto.TagResult](api, endpoints.PostTag, params)
+	result, err := uniapi.Get[dto.TagResult](api, endpoints.PostTag(), params)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func CreatePost(
 	type resp struct {
 		Id int `json:"id"`
 	}
-	result, err := uniapi.Post[resp](api, endpoints.PostPost, data, nil)
+	result, err := uniapi.Post[resp](api, endpoints.PostPost(), data, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -119,7 +119,7 @@ func FindPost(api *uniapi.UniAPI, categoryName, categoryId string, id int) (int,
 	type resp struct {
 		Position int `json:"position"`
 	}
-	result, err := uniapi.Get[resp](api, endpoints.PostFind, params)
+	result, err := uniapi.Get[resp](api, endpoints.PostFind(), params)
 	if err != nil {
 		return 0, err
 	}
@@ -137,7 +137,7 @@ type Post struct {
 // GetPost 获取帖子实例
 func GetPost(bdApi, nicoApi *uniapi.UniAPI, id int) (*Post, error) {
 	params := map[string]any{"id": id}
-	result, err := uniapi.Get[dto.PostDetail](bdApi, endpoints.PostDetails, params)
+	result, err := uniapi.Get[dto.PostDetail](bdApi, endpoints.PostDetails(), params)
 	if err != nil {
 		return nil, err
 	}
@@ -152,13 +152,13 @@ func GetPost(bdApi, nicoApi *uniapi.UniAPI, id int) (*Post, error) {
 // GetBasic 获取帖子简略信息
 func (p *Post) GetBasic() (*dto.PostBasic, error) {
 	params := map[string]any{"id": p.Id}
-	return uniapi.Get[dto.PostBasic](p.bdApi, endpoints.PostBasic, params)
+	return uniapi.Get[dto.PostBasic](p.bdApi, endpoints.PostBasic(), params)
 }
 
 // GetChart 获取帖子中的谱面信息
 func (p *Post) GetChart() (*charts.Chart, error) {
 	if p.Info.Chart == nil {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("chart of post %d", p.Id)}
+		return nil, &bestdori.NotExistError{Target: "chart of post " + strconv.Itoa(p.Id)}
 	}
 	return charts.UnmarshalSlice(*p.Info.Chart)
 }
@@ -171,7 +171,7 @@ func (p *Post) Content() string {
 		case dto.PostContentTypeText, dto.PostContentTypeLink:
 			result += item.Data
 		case dto.PostContentTypeEmoji:
-			result += fmt.Sprintf(":%s:", item.Data)
+			result += ":" + item.Data + ":"
 		case dto.PostContentTypeBr:
 			result += "\n"
 		}
@@ -182,7 +182,7 @@ func (p *Post) Content() string {
 // GetSong 获取谱面歌曲信息
 func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 	if p.Info.Song == nil {
-		return nil, nil, &bestdori.NotExistError{Target: fmt.Sprintf("song of post %d", p.Id)}
+		return nil, nil, &bestdori.NotExistError{Target: "song of post " + strconv.Itoa(p.Id)}
 	}
 	song := p.Info.Song
 
@@ -204,7 +204,7 @@ func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 		}
 	case dto.PostSongTypeBandori:
 		// BanG Dream! 歌曲
-		endpoint := fmt.Sprintf(endpoints.SongsInfo, song.Id)
+		endpoint := endpoints.SongsInfo(song.Id)
 		info, err := uniapi.Get[dto.SongInfo](p.nicoApi, endpoint, nil)
 		if err != nil {
 			return nil, nil, err
@@ -225,12 +225,12 @@ func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 			server = dto.ServerNameKR
 		} else {
 			return nil, nil, &bestdori.NotExistError{
-				Target: fmt.Sprintf("server of song %d in post %d", song.Id, p.Id),
+				Target: "server of song " + strconv.Itoa(song.Id) + " in post " + strconv.Itoa(p.Id),
 			}
 		}
 
 		// 获取音频
-		audio, _ = uniapi.Get[[]byte](p.nicoApi, fmt.Sprintf(endpoints.SongsSound, server, song.Id, song.Id), nil)
+		audio, _ = uniapi.Get[[]byte](p.nicoApi, endpoints.SongsSound(string(server), song.Id), nil)
 
 		// 获取封面
 		var index int = 0
@@ -241,33 +241,32 @@ func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 			index = (quotient + 1) * 10
 		}
 		jacketImage := info.JacketImage
-		endpoint = fmt.Sprintf(
-			endpoints.SongsMusicJacket,
-			server, index, index, jacketImage[len(jacketImage)-1],
+		endpoint = endpoints.SongsMusicJacket(
+			string(server), index, string(jacketImage[len(jacketImage)-1]),
 		)
 		cover, _ = uniapi.Get[[]byte](p.bdApi, endpoint, nil)
 	case dto.PostSongTypeLLSIF:
-		endpoint := fmt.Sprintf(endpoints.MiscLLSif, 10)
+		endpoint := endpoints.MiscLLSif(10)
 		misc, err := uniapi.Get[dto.LLSifMisc](p.nicoApi, endpoint, nil)
 		if err != nil {
 			return nil, nil, err
 		}
-		info, ok := (*misc)[fmt.Sprintf("%d", song.Id)]
+		info, ok := (*misc)[strconv.Itoa(song.Id)]
 		if !ok {
 			return nil, nil, &bestdori.NotExistError{
-				Target: fmt.Sprintf("song %d in llsif", song.Id),
+				Target: "song " + strconv.Itoa(song.Id) + " in llsif",
 			}
 		}
 
 		// 获取音频
-		endpoint = fmt.Sprintf("/%s", info.SoundAsset)
+		endpoint = "/" + info.SoundAsset
 		audio, _ = uniapi.Get[[]byte](p.nicoApi, endpoint, nil)
 
 		// 获取封面
-		endpoint = fmt.Sprintf("/%s", info.LiveIconAsset)
+		endpoint = "/" + info.LiveIconAsset
 		cover, _ = uniapi.Get[[]byte](p.nicoApi, endpoint, nil)
 	default:
-		return nil, nil, &bestdori.NotExistError{Target: fmt.Sprintf("song type `%s` of post %d", song.Type, p.Id)}
+		return nil, nil, &bestdori.NotExistError{Target: "song type `" + string(song.Type) + "` of post " + strconv.Itoa(p.Id)}
 	}
 
 	return audio, cover, nil
@@ -276,7 +275,7 @@ func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 // GetComments 获取帖子评论
 func (p *Post) GetComments(limit, offset int, order Order) (*dto.PostList, error) {
 	categoryName := "POST_COMMENT"
-	categoryId := fmt.Sprintf("%d", p.Id)
+	categoryId := strconv.Itoa(p.Id)
 
 	return GetList(
 		p.bdApi,
@@ -295,7 +294,7 @@ func (p *Post) Comment(content []dto.PostContent) (int, error) {
 	return CreatePost(
 		p.bdApi,
 		nil,
-		fmt.Sprintf("%d", p.Id),
+		strconv.Itoa(p.Id),
 		"POST_COMMENT",
 		nil,
 		content,
@@ -309,6 +308,6 @@ func (p *Post) Like(value bool) error {
 		"id":    p.Id,
 		"value": value,
 	}
-	_, err := uniapi.Post[any](p.bdApi, endpoints.PostLike, data, nil)
+	_, err := uniapi.Post[any](p.bdApi, endpoints.PostLike(), data, nil)
 	return err
 }

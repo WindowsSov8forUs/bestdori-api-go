@@ -2,7 +2,6 @@ package charts
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"slices"
 	"sort"
@@ -17,7 +16,7 @@ type Chart []Note
 
 // GetChart 获取官方谱面
 func GetChart(api *uniapi.UniAPI, id int, difficulty dto.ChartDifficultyName) (*Chart, error) {
-	endpoint := fmt.Sprintf(endpoints.ChartsInfo, id, difficulty)
+	endpoint := endpoints.ChartsInfo(id, string(difficulty))
 	return uniapi.Get[Chart](api, endpoint, nil)
 }
 

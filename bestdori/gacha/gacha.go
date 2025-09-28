@@ -1,7 +1,7 @@
 package gacha
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
@@ -12,25 +12,25 @@ import (
 
 // GetAll0 获取总招募 ID
 func GetAll0(api *uniapi.UniAPI) (*dto.EmptyStruct, error) {
-	endpoint := fmt.Sprintf(endpoints.GachaAll, 0)
+	endpoint := endpoints.GachaAll(0)
 	return uniapi.Get[dto.EmptyStruct](api, endpoint, nil)
 }
 
 // GetAll1 获取总招募简洁信息
 func GetAll1(api *uniapi.UniAPI) (*dto.GachaAll1, error) {
-	endpoint := fmt.Sprintf(endpoints.GachaAll, 1)
+	endpoint := endpoints.GachaAll(1)
 	return uniapi.Get[dto.GachaAll1](api, endpoint, nil)
 }
 
 // GetAll3 获取总招募较详细信息
 func GetAll3(api *uniapi.UniAPI) (*dto.GachaAll3, error) {
-	endpoint := fmt.Sprintf(endpoints.GachaAll, 3)
+	endpoint := endpoints.GachaAll(3)
 	return uniapi.Get[dto.GachaAll3](api, endpoint, nil)
 }
 
 // GetAll5 获取总招募详细信息
 func GetAll5(api *uniapi.UniAPI) (*dto.GachaAll5, error) {
-	endpoint := fmt.Sprintf(endpoints.GachaAll, 5)
+	endpoint := endpoints.GachaAll(5)
 	return uniapi.Get[dto.GachaAll5](api, endpoint, nil)
 }
 
@@ -43,7 +43,7 @@ type Gacha struct {
 
 // GetGacha 获取招募实例
 func GetGacha(api *uniapi.UniAPI, id int) (*Gacha, error) {
-	endpoint := fmt.Sprintf(endpoints.GachaInfo, id)
+	endpoint := endpoints.GachaInfo(id)
 	if info, err := uniapi.Get[dto.GachaInfo](api, endpoint, nil); err != nil {
 		return nil, err
 	} else {
@@ -80,7 +80,7 @@ func (g *Gacha) DefaultServer() dto.ServerName {
 // GetComments 获取招募评论
 func (g *Gacha) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
 	categoryName := "GACHA_COMMENT"
-	categoryId := fmt.Sprintf("%d", g.Id)
+	categoryId := strconv.Itoa(g.Id)
 
 	return post.GetList(
 		g.api,
@@ -98,21 +98,15 @@ func (g *Gacha) GetComments(limit, offset int, order post.Order) (*dto.PostList,
 func (g *Gacha) GetBanner(server dto.ServerName) (*[]byte, error) {
 	// 判断服务器
 	publishedAt := g.Info.PublishedAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if publishedAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", g.Id),
+			Target: "gacha " + strconv.Itoa(g.Id),
 			Server: server,
 		}
 	}
 
-	endpoint := fmt.Sprintf(
-		endpoints.HomebannerGet,
-		server, g.Info.BannerAssetBundleName,
-	)
+	endpoint := endpoints.HomebannerGet(string(server), g.Info.BannerAssetBundleName)
 	return uniapi.Get[[]byte](g.api, endpoint, nil)
 }
 
@@ -120,13 +114,10 @@ func (g *Gacha) GetBanner(server dto.ServerName) (*[]byte, error) {
 func (g *Gacha) GetPickups(server dto.ServerName) ([]*[]byte, error) {
 	// 判断服务器
 	publishedAt := g.Info.PublishedAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if publishedAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", g.Id),
+			Target: "gacha " + strconv.Itoa(g.Id),
 			Server: server,
 		}
 	}
@@ -134,7 +125,7 @@ func (g *Gacha) GetPickups(server dto.ServerName) ([]*[]byte, error) {
 	var results []*[]byte = make([]*[]byte, 0, 3)
 	var pickups = []string{"pickup1", "pickup2", "pickup"}
 	for _, pickup := range pickups {
-		endpoint := fmt.Sprintf(endpoints.GachaScreen, server, g.Id, pickup)
+		endpoint := endpoints.GachaScreen(string(server), g.Id, pickup)
 		if data, err := uniapi.Get[[]byte](g.api, endpoint, nil); err != nil {
 			continue
 		} else {
@@ -142,7 +133,7 @@ func (g *Gacha) GetPickups(server dto.ServerName) ([]*[]byte, error) {
 		}
 	}
 	if len(results) < 1 {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("gacha %d pickup image", g.Id)}
+		return nil, &bestdori.NotExistError{Target: "gacha " + strconv.Itoa(g.Id) + " pickup image"}
 	}
 	return results, nil
 }
@@ -151,19 +142,14 @@ func (g *Gacha) GetPickups(server dto.ServerName) ([]*[]byte, error) {
 func (g *Gacha) GetLogo(server dto.ServerName) (*[]byte, error) {
 	// 判断服务器
 	publishedAt := g.Info.PublishedAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if publishedAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", g.Id),
+			Target: "gacha " + strconv.Itoa(g.Id),
 			Server: server,
 		}
 	}
 
-	endpoint := fmt.Sprintf(
-		endpoints.GachaScreen, server, g.Id, "logo",
-	)
+	endpoint := endpoints.GachaScreen(string(server), g.Id, "logo")
 	return uniapi.Get[[]byte](g.api, endpoint, nil)
 }

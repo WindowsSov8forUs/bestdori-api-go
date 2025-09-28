@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http/cookiejar"
+	"strconv"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -97,19 +98,37 @@ func parseParams(params map[string]any) map[string]string {
 
 		switch val := v.(type) {
 		case string:
-			params[k] = val
-		case int, int8, int16, int32, int64:
-			params[k] = fmt.Sprintf("%d", val)
-		case uint, uint8, uint16, uint32, uint64:
-			params[k] = fmt.Sprintf("%d", val)
-		case float32, float64:
-			params[k] = fmt.Sprintf("%g", val)
+			result[k] = val
+		case int:
+			result[k] = strconv.Itoa(val)
+		case int8:
+			result[k] = strconv.FormatInt(int64(val), 10)
+		case int16:
+			result[k] = strconv.FormatInt(int64(val), 10)
+		case int32:
+			result[k] = strconv.FormatInt(int64(val), 10)
+		case int64:
+			result[k] = strconv.FormatInt(val, 10)
+		case uint:
+			result[k] = strconv.FormatUint(uint64(val), 10)
+		case uint8:
+			result[k] = strconv.FormatUint(uint64(val), 10)
+		case uint16:
+			result[k] = strconv.FormatUint(uint64(val), 10)
+		case uint32:
+			result[k] = strconv.FormatUint(uint64(val), 10)
+		case uint64:
+			result[k] = strconv.FormatUint(val, 10)
+		case float32:
+			result[k] = strconv.FormatFloat(float64(val), 'g', -1, 32)
+		case float64:
+			result[k] = strconv.FormatFloat(val, 'g', -1, 64)
 		case bool:
-			params[k] = fmt.Sprintf("%t", val)
+			result[k] = strconv.FormatBool(val)
 		case fmt.Stringer:
-			params[k] = val.String()
+			result[k] = val.String()
 		default:
-			params[k] = fmt.Sprintf("%v", val)
+			result[k] = fmt.Sprintf("%v", val)
 		}
 	}
 	return result

@@ -1,8 +1,6 @@
 package ayachan
 
 import (
-	"fmt"
-
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -19,7 +17,7 @@ func (e *AyachanResponseError) Error() string {
 	if e.ErrorInfo == "" {
 		return "ayachan responsed an error"
 	}
-	return fmt.Sprintf("ayachan responsed an error: %s", e.ErrorInfo)
+	return "ayachan responsed an error: " + e.ErrorInfo
 }
 
 func NewAyachanAPI(proxyURL string, timeout int) *uniapi.UniAPI {

@@ -2,6 +2,7 @@ package events
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/samber/lo"
 
@@ -18,37 +19,37 @@ import (
 
 // GetAll0 获取总活动 ID
 func GetAll0(api *uniapi.UniAPI) (*dto.EmptyStruct, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 0)
+	endpoint := endpoints.EventsAll(0)
 	return uniapi.Get[dto.EmptyStruct](api, endpoint, nil)
 }
 
 // GetAll1 获取总活动 ID 和名称
 func GetAll1(api *uniapi.UniAPI) (*dto.EventsAll1, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 1)
+	endpoint := endpoints.EventsAll(1)
 	return uniapi.Get[dto.EventsAll1](api, endpoint, nil)
 }
 
 // GetAll3 获取总活动简介信息
 func GetAll3(api *uniapi.UniAPI) (*dto.EventsAll3, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 3)
+	endpoint := endpoints.EventsAll(3)
 	return uniapi.Get[dto.EventsAll3](api, endpoint, nil)
 }
 
 // GetAll4 获取总活动较详细信息
 func GetAll4(api *uniapi.UniAPI) (*dto.EventsAll4, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 4)
+	endpoint := endpoints.EventsAll(4)
 	return uniapi.Get[dto.EventsAll4](api, endpoint, nil)
 }
 
 // GetAll5 获取总活动详细信息
 func GetAll5(api *uniapi.UniAPI) (*dto.EventArchiveAll5, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 5)
+	endpoint := endpoints.EventsAll(5)
 	return uniapi.Get[dto.EventArchiveAll5](api, endpoint, nil)
 }
 
 // GetAll6 获取总活动详细信息
 func GetAll6(api *uniapi.UniAPI) (*dto.EventsAll6, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsAll, 6)
+	endpoint := endpoints.EventsAll(6)
 	return uniapi.Get[dto.EventsAll6](api, endpoint, nil)
 }
 
@@ -62,7 +63,7 @@ type Event struct {
 
 // GetEvent 获取活动实例
 func GetEvent(api *uniapi.UniAPI, eventId int) (*Event, error) {
-	endpoint := fmt.Sprintf(endpoints.EventsInfo, eventId)
+	endpoint := endpoints.EventsInfo(eventId)
 	info, err := uniapi.Get[dto.EventInfo](api, endpoint, nil)
 	if err != nil {
 		return nil, err
@@ -84,7 +85,7 @@ func GetEvent(api *uniapi.UniAPI, eventId int) (*Event, error) {
 // GetComments 获取活动评论
 func (e *Event) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
 	categoryName := "EVENT_COMMENT"
-	categoryId := fmt.Sprintf("%d", e.Id)
+	categoryId := strconv.Itoa(e.Id)
 
 	return post.GetList(
 		e.api,
@@ -107,18 +108,15 @@ func (e *Event) Tracker(server dto.Server) *eventtracker.EventTracker {
 func (e *Event) GetBanner(server dto.ServerName) (*[]byte, error) {
 	// 判断服务器
 	startAt := e.Info.StartAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if startAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", e.Id),
+			Target: "event " + strconv.Itoa(e.Id),
 			Server: server,
 		}
 	}
 
-	endpoint := fmt.Sprintf(endpoints.EventBanner, server, e.Info.AssetBundleName)
+	endpoint := endpoints.EventBanner(string(server), e.Info.AssetBundleName)
 	return uniapi.Get[[]byte](e.api, endpoint, nil)
 }
 
@@ -126,18 +124,15 @@ func (e *Event) GetBanner(server dto.ServerName) (*[]byte, error) {
 func (e *Event) GetLogo(server dto.ServerName) (*[]byte, error) {
 	// 判断服务器
 	startAt := e.Info.StartAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if startAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", e.Id),
+			Target: "event " + strconv.Itoa(e.Id),
 			Server: server,
 		}
 	}
 
-	endpoint := fmt.Sprintf(endpoints.EventLogo, server, e.Info.AssetBundleName)
+	endpoint := endpoints.EventLogo(string(server), e.Info.AssetBundleName)
 	return uniapi.Get[[]byte](e.api, endpoint, nil)
 }
 
@@ -145,18 +140,15 @@ func (e *Event) GetLogo(server dto.ServerName) (*[]byte, error) {
 func (e *Event) GetTopScreen(server dto.ServerName, typ string) (*[]byte, error) {
 	// 判断服务器
 	startAt := e.Info.StartAt
-	serverId, err := bestdori.ServerNameToId(server)
-	if err != nil {
-		return nil, err
-	}
+	serverId := server.Id()
 	if startAt[serverId] == nil {
 		return nil, &bestdori.ServerNotAvailableError{
-			Target: fmt.Sprintf("event %d", e.Id),
+			Target: "event " + strconv.Itoa(e.Id),
 			Server: server,
 		}
 	}
 
-	endpoint := fmt.Sprintf(endpoints.EventTopScreen, server, e.Info.AssetBundleName, typ)
+	endpoint := endpoints.EventTopScreen(string(server), e.Info.AssetBundleName, typ)
 	return uniapi.Get[[]byte](e.api, endpoint, nil)
 }
 
@@ -167,7 +159,7 @@ func (e *Event) GetStamp() (*[]byte, error) {
 		return pr != nil
 	})
 	if !ok {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("point reward of event %d", e.Id)}
+		return nil, &bestdori.NotExistError{Target: "point reward of event " + strconv.Itoa(e.Id)}
 	}
 
 	// 获取 rewardType 为 stamp 的活动奖励
@@ -175,10 +167,10 @@ func (e *Event) GetStamp() (*[]byte, error) {
 		return r.RewardType == "stamp"
 	})
 	if !ok {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("stamp reward of event %d", e.Id)}
+		return nil, &bestdori.NotExistError{Target: "stamp reward of event " + strconv.Itoa(e.Id)}
 	}
 	if reward.RewardId == nil {
-		return nil, &bestdori.NotExistError{Target: fmt.Sprintf("stamp reward of event %d", e.Id)}
+		return nil, &bestdori.NotExistError{Target: "stamp reward of event " + strconv.Itoa(e.Id)}
 	}
 
 	stamp, err := stamps.GetStamp(e.api, *reward.RewardId)
