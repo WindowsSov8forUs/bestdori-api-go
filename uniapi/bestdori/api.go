@@ -9,7 +9,7 @@ type BestdoriAPIResponse struct {
 	Code   string `json:"code,omitempty"`
 }
 
-type RequestFiledError struct {
+type RequestFailedError struct {
 	*uniapi.ResponseError
 	Code string
 }
@@ -20,7 +20,7 @@ func (e *AssetsNotExistError) Error() string {
 	return "assets or res `" + e.Response.Request.URL + "` not exist"
 }
 
-func (e *RequestFiledError) Error() string {
+func (e *RequestFailedError) Error() string {
 	if e.Code == "" {
 		return "request failed"
 	}

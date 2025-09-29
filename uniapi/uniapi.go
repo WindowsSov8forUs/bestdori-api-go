@@ -71,6 +71,13 @@ func NewAPI(url, proxyURL string, timeout int) *UniAPI {
 	}
 }
 
+// SetCookies 从响应中设置 Cookie
+func (api *UniAPI) SetCookies(resp *resty.Response) {
+	if resp != nil {
+		api.client.SetCookies(resp.Cookies())
+	}
+}
+
 func (api *UniAPI) OnAfterResponse(f resty.ResponseMiddleware) {
 	api.client.OnAfterResponse(f)
 }
@@ -182,12 +189,19 @@ func (api *UniAPI) post(endpoint string, data any, files FilesFormData, value an
 		return nil, err
 	}
 
-	response, err := req.SetResult(&value).Post(endpoint)
-	if err != nil {
-		return nil, err
+	if _, ok := value.(*resty.Response); ok {
+		response, err := req.Post(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
+	} else {
+		response, err := req.SetResult(&value).Post(endpoint)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
 	}
-
-	return response, nil
 }
 
 func Get[T any](api *UniAPI, endpoint string, params map[string]any) (*T, error) {

@@ -4,6 +4,10 @@ import "strconv"
 
 // Private constants for API endpoints
 const (
+	apiUser      = "/api/user"
+	apiUserLogin = "/api/user/login"
+	apiUserMe    = "/api/user/me"
+
 	apiPostBasic   = "/api/post/basic"
 	apiPostDetails = "/api/post/details"
 	apiPostList    = "/api/post/list"
@@ -45,6 +49,11 @@ const (
 	apiBandsAll  = "/api/bands/all."
 	apiBandsMain = "/api/bands/main."
 
+	apiUploadFile    = "/api/upload/file/"
+	apiUploadPrepare = "/api/upload/prepare"
+	apiUpload        = "/api/upload"
+	apiUploadStatus  = "/api/upload/status/"
+
 	apiMiscLLSif = "/api/misc/llsif."
 
 	apiPlayerInfo = "/api/player/"
@@ -62,6 +71,18 @@ const (
 )
 
 // API endpoints functions
+func UserInfo() string {
+	return apiUser
+}
+
+func UserLogin() string {
+	return apiUserLogin
+}
+
+func UserMe() string {
+	return apiUserMe
+}
+
 func PostBasic() string {
 	return apiPostBasic
 }
@@ -309,6 +330,32 @@ func BandsMain(index int) string {
 	builder.WriteString(apiBandsMain)
 	builder.WriteString(strconv.Itoa(index))
 	builder.WriteString(json)
+	return builder.String()
+}
+
+func UploadFile(hash string) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiUploadFile)
+	builder.WriteString(hash)
+	return builder.String()
+}
+
+func UploadPrepare() string {
+	return apiUploadPrepare
+}
+
+func UploadUpload() string {
+	return apiUpload
+}
+
+func UploadStatus(hash string) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiUploadStatus)
+	builder.WriteString(hash)
 	return builder.String()
 }
 

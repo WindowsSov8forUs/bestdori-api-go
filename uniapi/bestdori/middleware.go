@@ -37,7 +37,7 @@ func onAfterResponse(client *resty.Client, response *resty.Response) error {
 			return nil
 		} else if !*resp.Result {
 			code := resp.Code
-			return &RequestFiledError{
+			return &RequestFailedError{
 				ResponseError: &uniapi.ResponseError{Response: response},
 				Code:          code,
 			}
