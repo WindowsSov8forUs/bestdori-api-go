@@ -47,6 +47,8 @@ const (
 
 	apiMiscLLSif = "/api/misc/llsif."
 
+	apiPlayerInfo = "/api/player/"
+
 	apiTrackerEventTop     = "/api/eventtop/data"
 	apiTrackerEventTracker = "/api/tracker/data"
 	apiTrackerRates        = "/api/tracker/rates.json"
@@ -315,6 +317,17 @@ func MiscLLSif(index int) string {
 	builder.WriteString(apiMiscLLSif)
 	builder.WriteString(strconv.Itoa(index))
 	builder.WriteString(json)
+	return builder.String()
+}
+
+func PlayerInfo(server string, id int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiPlayerInfo)
+	builder.WriteString(server)
+	builder.WriteString("/")
+	builder.WriteString(strconv.Itoa(id))
 	return builder.String()
 }
 
