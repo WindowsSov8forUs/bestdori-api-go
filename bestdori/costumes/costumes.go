@@ -6,6 +6,7 @@ import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/post"
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/thumb"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -89,6 +90,5 @@ func (c *Costume) GetSdchara() (*[]byte, error) {
 
 // GetIcon 获取图标
 func (c *Costume) GetIcon() (*[]byte, error) {
-	endpoint := endpoints.ThumbCostume(string(c.DefaultServer()), c.Id/50, c.Info.AssetBundleName)
-	return uniapi.Get[[]byte](c.api, endpoint, nil)
+	return thumb.GetCostume(c.api, c.Id, c.Info.AssetBundleName, c.DefaultServer())
 }

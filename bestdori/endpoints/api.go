@@ -53,7 +53,9 @@ const (
 	apiTrackerEventTracker = "/api/tracker/data"
 	apiTrackerRates        = "/api/tracker/rates.json"
 
+	apiSkillsAll                 = "/api/skills/all."
 	apiStampsAll                 = "/api/stamps/all."
+	apiMetaAll                   = "/api/songs/meta/all."
 	apiArchivesAll               = "/api/archives/all."
 	apiMiracleTicketExchangesAll = "/api/miracleTicketExchanges/all."
 	apiComicsAll                 = "/api/comics/all."
@@ -343,11 +345,31 @@ func TrackerRates() string {
 	return apiTrackerRates
 }
 
+func SkillsAll(index int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiSkillsAll)
+	builder.WriteString(strconv.Itoa(index))
+	builder.WriteString(json)
+	return builder.String()
+}
+
 func StampsAll(index int) string {
 	builder := getBuilder()
 	defer putBuilder(builder)
 
 	builder.WriteString(apiStampsAll)
+	builder.WriteString(strconv.Itoa(index))
+	builder.WriteString(json)
+	return builder.String()
+}
+
+func MetaAll(index int) string {
+	builder := getBuilder()
+	defer putBuilder(builder)
+
+	builder.WriteString(apiMetaAll)
 	builder.WriteString(strconv.Itoa(index))
 	builder.WriteString(json)
 	return builder.String()

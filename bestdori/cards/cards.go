@@ -7,6 +7,7 @@ import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/post"
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/thumb"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -154,10 +155,7 @@ func (c *Card) GetTrim(typ dto.CardTrain) (*[]byte, error) {
 
 // GetThumb 获取卡牌缩略图图片
 func (c *Card) GetThumb(typ dto.CardTrain) (*[]byte, error) {
-	endpoint := endpoints.ThumbChara(
-		string(c.DefaultServer()), c.Id/50, c.Info.ResourceSetName, string(typ),
-	)
-	return uniapi.Get[[]byte](c.api, endpoint, nil)
+	return thumb.GetChara(c.api, c.Id, c.Info.ResourceSetName, typ, c.DefaultServer())
 }
 
 // GetLiveSD 获取 LIVE 服装图片
