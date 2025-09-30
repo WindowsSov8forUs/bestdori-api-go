@@ -26,7 +26,7 @@ func (e *SonolusResponseError) Error() string {
 }
 
 func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://sonolus.ayachan.fun", proxyURL, timeout)
+	api := uniapi.NewAPI("https://sonolus.ayachan.fun/test/sonolus", proxyURL, timeout)
 	api.OnAfterResponse(onAfterResponse)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api

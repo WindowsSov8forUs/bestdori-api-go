@@ -21,7 +21,7 @@ func (e *AyachanResponseError) Error() string {
 }
 
 func NewAyachanAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://api.ayachan.fun", proxyURL, timeout)
+	api := uniapi.NewAPI("https://api.ayachan.fun/v2", proxyURL, timeout)
 	api.OnAfterResponse(onAfterResponse)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api
