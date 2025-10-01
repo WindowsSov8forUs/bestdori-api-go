@@ -1,5 +1,5 @@
-// Package bestdorigo provides a Go SDK for accessing various BanG Dream related APIs
-package bestdorigo
+// Package bestdoriapi provides a Go SDK for accessing various BanG Dream related APIs
+package bestdoriapi
 
 import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan"
