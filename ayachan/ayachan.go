@@ -7,7 +7,23 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-func onAfterResponse(client *resty.Client, response *resty.Response) error {
+type AyachanAPIResponse struct {
+	Error string `json:"error,omitempty"`
+}
+
+type AyachanResponseError struct {
+	*uniapi.ResponseError
+	ErrorInfo string
+}
+
+func (e *AyachanResponseError) Error() string {
+	if e.ErrorInfo == "" {
+		return "ayachan responsed an error"
+	}
+	return "ayachan responsed an error: " + e.ErrorInfo
+}
+
+func OnAfterResponseAyachan(client *resty.Client, response *resty.Response) error {
 	// 处理异常响应
 	if response.StatusCode() == 400 || response.StatusCode() == 500 {
 		// 解析通用响应体

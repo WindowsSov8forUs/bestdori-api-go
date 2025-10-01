@@ -9,9 +9,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/endpoints"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
-	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi/bestdori"
 )
 
 type uploadResponse struct {

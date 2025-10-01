@@ -1,7 +1,10 @@
-package sonolus
+package ayachan
 
 import (
+	"encoding/json"
+
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
+	"github.com/go-resty/resty/v2"
 )
 
 type SonolusAPIResponse struct {
@@ -25,9 +28,20 @@ func (e *SonolusResponseError) Error() string {
 	return "sonolus ayachan server responsed an error: `" + e.errorInfo() + "`"
 }
 
-func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://sonolus.ayachan.fun/test/sonolus", proxyURL, timeout)
-	api.OnAfterResponse(onAfterResponse)
-	api.OnAfterResponse(api.ContentTypeMiddleware())
-	return api
+func OnAfterResponseSonolus(client *resty.Client, response *resty.Response) error {
+	// 处理异常响应
+	if response.StatusCode() != 200 {
+		// 解析通用响应体
+		var resp SonolusAPIResponse
+		if err := json.Unmarshal(response.Body(), &resp); err != nil {
+			return err
+		}
+		return &SonolusResponseError{
+			ResponseError: &uniapi.ResponseError{Response: response},
+			Code:          resp.Code,
+			Description:   resp.Description,
+			Detail:        resp.Detail,
+		}
+	}
+	return uniapi.RaiseForStatus(response)
 }
