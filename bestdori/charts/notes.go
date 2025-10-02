@@ -10,7 +10,7 @@ import (
 
 type Connection struct {
 	Beat   float64 `json:"beat"`             // 音符所在节拍值
-	Lane   int     `json:"lane"`             // 音符所在轨道
+	Lane   float64 `json:"lane"`             // 音符所在轨道
 	Flick  bool    `json:"flick,omitempty"`  // 是否为 flick 音符
 	Skill  bool    `json:"skill,omitempty"`  // 是否为技能音符
 	Hidden bool    `json:"hidden,omitempty"` // 是否为隐藏音符
@@ -25,7 +25,7 @@ type Note struct {
 	Flick       bool              `json:"flick,omitempty"`       // 是否为 flick 音符
 	Skill       bool              `json:"skill,omitempty"`       // 是否为技能音符
 	Hidden      bool              `json:"hidden,omitempty"`      // 是否为隐藏音符
-	Lane        int               `json:"lane"`                  // 音符所在轨道
+	Lane        float64           `json:"lane"`                  // 音符所在轨道
 }
 
 func unmarshalMap(data map[string]any) (*Note, error) {
@@ -53,7 +53,7 @@ func (n *Note) MarshalJSON() ([]byte, error) {
 	if n.Type == dto.NoteTypeBPM {
 		type Aux struct {
 			Alias
-			Lane int `json:"lane,omitempty"`
+			Lane float64 `json:"lane,omitempty"`
 		}
 		aux := Aux{Alias: Alias(*n), Lane: n.Lane}
 		return json.Marshal(aux)
@@ -61,7 +61,7 @@ func (n *Note) MarshalJSON() ([]byte, error) {
 		type Aux struct {
 			Alias
 			Beat float64 `json:"beat,omitempty"`
-			Lane int     `json:"lane,omitempty"`
+			Lane float64 `json:"lane,omitempty"`
 		}
 		aux := Aux{Alias: Alias(*n), Beat: n.Beat, Lane: n.Lane}
 		return json.Marshal(aux)
