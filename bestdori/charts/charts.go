@@ -258,11 +258,6 @@ func (c *Chart) Standardize() {
 
 	var result Chart = make(Chart, 0, len(*c))
 	for _, note := range *c {
-		// 修正偏移量
-		note.Beat -= offset
-		if note.Beat < 0.0 {
-			note.Beat = 0.0
-		}
 		if note.Type == dto.NoteTypeSlide || note.Type == dto.NoteTypeLong {
 			var connections []Connection = make([]Connection, 0, len(note.Connections))
 
@@ -282,6 +277,12 @@ func (c *Chart) Standardize() {
 				connections = append(connections, connection)
 			}
 			note.Connections = connections
+		} else {
+			// 修正偏移量
+			note.Beat -= offset
+			if note.Beat < 0.0 {
+				note.Beat = 0.0
+			}
 		}
 		result = append(result, note)
 	}
