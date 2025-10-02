@@ -218,6 +218,12 @@ func (c *Chart) Count() *dto.ChartStats {
 		// 以谱面最后一个音符 Beat 值作为最后一个 BPM 计算的结束点
 		duration := (notes[len(notes)-1].Beat - prevBeat) * 60.0 / math.Abs(prevBPM)
 		handleBPMDuration(duration, prevBPM, &bpmDurationStack)
+		if prevBPM > 0.0 && duration > 0.0 {
+			if _, ok := bpms[prevBPM]; !ok {
+				bpms[prevBPM] = struct{}{}
+				stats.BPMs = append(stats.BPMs, prevBPM)
+			}
+		}
 	}
 
 	// 处理 BPM 计算栈计算谱面时长与 BPM 时长统计
