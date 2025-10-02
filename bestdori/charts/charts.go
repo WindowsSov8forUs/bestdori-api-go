@@ -201,9 +201,11 @@ func (c *Chart) Count() *dto.ChartStats {
 			}
 			prevBPM = note.BPM
 			prevBeat = note.Beat
-			if _, ok := bpms[prevBPM]; !ok {
-				bpms[prevBPM] = struct{}{}
-				stats.BPMs = append(stats.BPMs, prevBPM)
+			if prevBPM > 0.0 {
+				if _, ok := bpms[prevBPM]; !ok {
+					bpms[prevBPM] = struct{}{}
+					stats.BPMs = append(stats.BPMs, prevBPM)
+				}
 			}
 		} else {
 			if !note.Hidden {
