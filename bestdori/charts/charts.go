@@ -78,7 +78,7 @@ func (c *Chart) Swap(i, j int) {
 	(*c)[i], (*c)[j] = (*c)[j], (*c)[i]
 }
 
-func (c *Chart) IsSpecialRhythm() bool {
+func (c *Chart) HasSpecialRhythm() bool {
 	for _, note := range *c {
 		if note.Type == dto.NoteTypeDirectional {
 			return true
