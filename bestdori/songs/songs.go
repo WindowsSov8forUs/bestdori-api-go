@@ -43,14 +43,14 @@ func GetAll8(api *uniapi.UniAPI) (*dto.SongsAll8, error) {
 
 // Jacket 歌曲封面
 type Jacket struct {
+	JacketImage string
 	index       int
-	jacketImage string
 	server      dto.ServerName
 	api         *uniapi.UniAPI
 }
 
 func (j *Jacket) Endpoint() string {
-	return endpoints.SongsMusicJacket(string(j.server), j.index, j.jacketImage)
+	return endpoints.SongsMusicJacket(string(j.server), j.index, j.JacketImage)
 }
 
 // Bytes 获取封面图片字节
@@ -119,7 +119,7 @@ func (s *Song) GetJacket() []Jacket {
 	for _, image := range jacketImage {
 		jacket := Jacket{
 			index:       index,
-			jacketImage: image,
+			JacketImage: image,
 			server:      s.DefaultServer(),
 			api:         s.api,
 		}
