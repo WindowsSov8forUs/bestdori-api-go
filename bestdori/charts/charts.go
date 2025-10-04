@@ -78,6 +78,22 @@ func (c *Chart) Swap(i, j int) {
 	(*c)[i], (*c)[j] = (*c)[j], (*c)[i]
 }
 
+func (c *Chart) IsSpecialRhythm() bool {
+	for _, note := range *c {
+		if note.Type == dto.NoteTypeDirectional {
+			return true
+		}
+		if note.Type == dto.NoteTypeLong || note.Type == dto.NoteTypeSlide {
+			for _, conn := range note.Connections {
+				if conn.Hidden {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 func (c *Chart) flatten() []Note {
 	var notes []Note
 	for _, note := range *c {
