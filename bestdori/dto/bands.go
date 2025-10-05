@@ -2,7 +2,7 @@ package dto
 
 // 乐队信息
 type BandsInfo struct {
-	BandName []string `json:"bandName"` // 乐队名称 定长列表
+	BandName []*string `json:"bandName"` // 乐队名称 定长列表
 }
 
 // 总乐队信息
