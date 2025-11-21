@@ -14,6 +14,7 @@ type Connection struct {
 	Flick  bool    `json:"flick,omitempty"`  // 是否为 flick 音符
 	Skill  bool    `json:"skill,omitempty"`  // 是否为技能音符
 	Hidden bool    `json:"hidden,omitempty"` // 是否为隐藏音符
+	Charge bool    `json:"charge,omitempty"` // 是否为 Fever 充能
 }
 
 type Note struct {
@@ -26,6 +27,7 @@ type Note struct {
 	Skill       bool              `json:"skill,omitempty"`       // 是否为技能音符
 	Hidden      bool              `json:"hidden,omitempty"`      // 是否为隐藏音符
 	Lane        float64           `json:"lane"`                  // 音符所在轨道
+	Charge      bool              `json:"charge,omitempty"`      // 是否为 Fever 充能
 }
 
 func unmarshalMap(data map[string]any) (*Note, error) {
