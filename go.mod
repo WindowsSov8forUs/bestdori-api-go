@@ -1,6 +1,6 @@
 module github.com/WindowsSov8forUs/bestdori-api-go
 
-go 1.21.5
+go 1.25.4
 
 require (
 	github.com/go-resty/resty/v2 v2.16.5
