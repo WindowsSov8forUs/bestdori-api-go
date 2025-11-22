@@ -45,10 +45,10 @@ const (
 )
 
 type ChartStats struct {
-	Time    float64   // 谱面时长，单位秒
-	Notes   int       // 音符总数
-	BPMs    []float64 // 谱面包含的 BPM 值列表
-	MainBPM float64   // 谱面主要 BPM 值
+	Time    float64   `json:"time"`    // 谱面时长，单位秒
+	Notes   int       `json:"notes"`   // 音符总数
+	BPMs    []float64 `json:"bpms"`    // 谱面包含的 BPM 值列表
+	MainBPM float64   `json:"mainBpm"` // 谱面主要 BPM 值
 }
 
 type Connection struct {
@@ -249,8 +249,8 @@ func handleBPMDuration(duration float64, prevBPM float64, bpmDurationStack *[]bp
 	}
 }
 
-// Count 谱面数据统计
-func (c *Chart) Count() *ChartStats {
+// Stats 谱面数据统计
+func (c *Chart) Stats() *ChartStats {
 	var stats ChartStats = ChartStats{
 		Time:    0.0,
 		Notes:   0,
