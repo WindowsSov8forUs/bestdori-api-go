@@ -156,7 +156,7 @@ func (p *Post) GetBasic() (*dto.PostBasic, error) {
 }
 
 // GetChart 获取帖子中的谱面信息
-func (p *Post) GetChart() (*charts.Chart, error) {
+func (p *Post) GetChart() (*dto.Chart, error) {
 	if p.Info.Chart == nil {
 		return nil, &bestdori.NotExistError{Target: "chart of post " + strconv.Itoa(p.Id)}
 	}

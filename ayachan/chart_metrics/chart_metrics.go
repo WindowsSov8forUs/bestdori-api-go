@@ -3,7 +3,6 @@ package chartmetrics
 import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan/endpoints"
-	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/charts"
 	bdDto "github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
@@ -21,7 +20,7 @@ func ChartMetricsBestdori(api *uniapi.UniAPI, chartId int) (*dto.ChartMetrics, e
 }
 
 // ChartMetricsCustom 自定义谱面分析
-func ChartMetricsCustom(api *uniapi.UniAPI, diffStr string, chart *charts.Chart) (*dto.ChartMetrics, error) {
+func ChartMetricsCustom(api *uniapi.UniAPI, diffStr string, chart *bdDto.Chart) (*dto.ChartMetrics, error) {
 	endpoint := endpoints.ChartMetricsCustom(diffStr)
 	return uniapi.Post[dto.ChartMetrics](api, endpoint, chart, nil)
 }

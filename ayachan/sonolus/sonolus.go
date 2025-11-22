@@ -8,7 +8,7 @@ import (
 
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan/endpoints"
-	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori/charts"
+	bdDto "github.com/WindowsSov8forUs/bestdori-api-go/bestdori/dto"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
 )
 
@@ -17,7 +17,7 @@ type levelsPostResponse struct {
 }
 
 // LevelsPost Sonolus 测试谱面上传
-func LevelsPost(snlsApi *uniapi.UniAPI, title, bgm string, chart *charts.Chart, difficulty int, hidden bool, lifetime int) (int, error) {
+func LevelsPost(snlsApi *uniapi.UniAPI, title, bgm string, chart *bdDto.Chart, difficulty int, hidden bool, lifetime int) (int, error) {
 	// 打开 BGM 文件
 	file, err := os.Open(bgm)
 	if err != nil {
@@ -61,8 +61,8 @@ func LevelsPost(snlsApi *uniapi.UniAPI, title, bgm string, chart *charts.Chart, 
 }
 
 // LevelsGet Sonolus 测试谱面获取
-func LevelsGet(snlsApi *uniapi.UniAPI, uid int) (*charts.Chart, error) {
-	return uniapi.Get[charts.Chart](snlsApi, endpoints.LevelsGet(uid), nil)
+func LevelsGet(snlsApi *uniapi.UniAPI, uid int) (*bdDto.Chart, error) {
+	return uniapi.Get[bdDto.Chart](snlsApi, endpoints.LevelsGet(uid), nil)
 }
 
 // Levels Sonolus 测试服谱面信息获取

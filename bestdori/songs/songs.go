@@ -129,7 +129,7 @@ func (s *Song) GetJacket() []Jacket {
 }
 
 // GetChart 获取歌曲谱面
-func (s *Song) GetChart(diff dto.ChartDifficultyName) (*charts.Chart, error) {
+func (s *Song) GetChart(diff dto.ChartDifficultyName) (*dto.Chart, error) {
 	if chart, err := charts.GetChart(s.api, s.Id, diff); err == nil {
 		return chart, nil
 	} else {
