@@ -74,10 +74,10 @@ type Note struct {
 }
 
 func (n *Note) MarshalJSON() ([]byte, error) {
-	if n.Type != NoteTypeBPM && n.Type != NoteTypeSlide && n.Type != NoteTypeLong {
-		return json.Marshal(n)
-	}
 	type Alias Note
+	if n.Type != NoteTypeBPM && n.Type != NoteTypeSlide && n.Type != NoteTypeLong {
+		return json.Marshal(Alias(*n))
+	}
 	if n.Type == NoteTypeBPM {
 		type Aux struct {
 			Alias
