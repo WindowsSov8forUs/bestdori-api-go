@@ -73,15 +73,12 @@ func (lc *LoginCampaign) DefaultServer() dto.ServerName {
 
 // GetComments 获取登录奖励评论
 func (lc *LoginCampaign) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "LOGINCAMPAIGN_COMMENT"
-	categoryId := strconv.Itoa(lc.Id)
-
 	return post.GetList(
 		lc.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"LOGINCAMPAIGN_COMMENT",
+		strconv.Itoa(lc.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

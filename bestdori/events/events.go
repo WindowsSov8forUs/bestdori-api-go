@@ -84,15 +84,12 @@ func GetEvent(api *uniapi.UniAPI, eventId int) (*Event, error) {
 
 // GetComments 获取活动评论
 func (e *Event) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "EVENT_COMMENT"
-	categoryId := strconv.Itoa(e.Id)
-
 	return post.GetList(
 		e.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"EVENT_COMMENT",
+		strconv.Itoa(e.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

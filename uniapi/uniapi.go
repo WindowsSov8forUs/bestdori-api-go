@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http/cookiejar"
-	"reflect"
 	"strconv"
 	"time"
 
@@ -165,18 +164,7 @@ func (api *UniAPI) buildRequest(params map[string]any, data any, files FilesForm
 
 	// 设置请求体
 	if data != nil {
-		// 清除 data 中的 nil 字段
-		if m, ok := data.(map[string]any); ok {
-			body := make(map[string]any)
-			for k, v := range m {
-				if !reflect.ValueOf(v).IsNil() {
-					body[k] = v
-				}
-			}
-			req.SetBody(body)
-		} else {
-			req.SetBody(data)
-		}
+		req.SetBody(data)
 	}
 
 	// 设置文件表单

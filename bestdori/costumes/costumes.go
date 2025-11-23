@@ -67,15 +67,12 @@ func (c *Costume) DefaultServer() dto.ServerName {
 
 // GetComments 获取服装评论
 func (c *Costume) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "COSTUME_COMMENT"
-	categoryId := strconv.Itoa(c.Id)
-
 	return post.GetList(
 		c.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"COSTUME_COMMENT",
+		strconv.Itoa(c.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

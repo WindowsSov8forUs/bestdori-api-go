@@ -72,15 +72,12 @@ func (c *Character) Names() []*string {
 
 // GetComments 获取角色评论
 func (c *Character) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "CHARACTER_COMMENT"
-	categoryId := strconv.Itoa(c.Id)
-
 	return post.GetList(
 		c.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"CHARACTER_COMMENT",
+		strconv.Itoa(c.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

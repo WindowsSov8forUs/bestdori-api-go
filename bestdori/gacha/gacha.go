@@ -79,15 +79,12 @@ func (g *Gacha) DefaultServer() dto.ServerName {
 
 // GetComments 获取招募评论
 func (g *Gacha) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "GACHA_COMMENT"
-	categoryId := strconv.Itoa(g.Id)
-
 	return post.GetList(
 		g.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"GACHA_COMMENT",
+		strconv.Itoa(g.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

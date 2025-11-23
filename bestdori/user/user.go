@@ -34,8 +34,8 @@ func GetUser(api *uniapi.UniAPI, username string) (*User, error) {
 func (u *User) GetPosts(limit, offset int, order post.Order) (*dto.PostList, error) {
 	return post.GetList(
 		u.api,
-		nil, nil, nil, nil, nil,
-		&u.Username,
+		"", false, "", "", nil,
+		u.Username,
 		order,
 		limit,
 		offset,
@@ -44,16 +44,13 @@ func (u *User) GetPosts(limit, offset int, order post.Order) (*dto.PostList, err
 
 // GetCharts 获取用户的谱面列表
 func (u *User) GetCharts(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "SELF_POST"
-	categoryId := "chart"
-
 	return post.GetList(
 		u.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
+		"", false,
+		"SELF_POST",
+		"chart",
 		nil,
-		&u.Username,
+		u.Username,
 		order,
 		limit,
 		offset,
@@ -62,16 +59,13 @@ func (u *User) GetCharts(limit, offset int, order post.Order) (*dto.PostList, er
 
 // GetTexts 获取用户的文本帖子
 func (u *User) GetTexts(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "SELF_POST"
-	categoryId := "text"
-
 	return post.GetList(
 		u.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
+		"", false,
+		"SELF_POST",
+		"text",
 		nil,
-		&u.Username,
+		u.Username,
 		order,
 		limit,
 		offset,
@@ -80,16 +74,13 @@ func (u *User) GetTexts(limit, offset int, order post.Order) (*dto.PostList, err
 
 // GetStories 获取用户的故事帖子
 func (u *User) GetStories(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "SELF_POST"
-	categoryId := "story"
-
 	return post.GetList(
 		u.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
+		"", false,
+		"SELF_POST",
+		"story",
 		nil,
-		&u.Username,
+		u.Username,
 		order,
 		limit,
 		offset,

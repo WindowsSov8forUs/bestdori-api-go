@@ -20,25 +20,38 @@ const (
 // GetList 搜索社区帖子
 func GetList(
 	api *uniapi.UniAPI,
-	search *string,
-	following *bool,
-	categoryName, categoryId *string,
+	search string,
+	following bool,
+	categoryName, categoryId string,
 	tags *[]dto.PostTag,
-	username *string,
+	username string,
 	order Order,
 	limit int,
 	offset int,
 ) (*dto.PostList, error) {
 	data := map[string]any{
-		"search":       search,
-		"following":    following,
-		"categoryName": categoryName,
-		"categoryId":   categoryId,
-		"tags":         tags,
-		"username":     username,
-		"order":        order,
-		"limit":        limit,
-		"offset":       offset,
+		"order":  order,
+		"limit":  limit,
+		"offset": offset,
+	}
+	// 可选字段
+	if search != "" {
+		data["search"] = search
+	}
+	if following {
+		data["following"] = following
+	}
+	if categoryName != "" {
+		data["categoryName"] = categoryName
+	}
+	if categoryId != "" {
+		data["categoryId"] = categoryId
+	}
+	if tags != nil {
+		data["tags"] = tags
+	}
+	if username != "" {
+		data["username"] = username
 	}
 	return uniapi.Post[dto.PostList](api, endpoints.PostList(), data, nil)
 }
@@ -274,15 +287,12 @@ func (p *Post) GetSong() (*[]byte, *[]byte, error) {
 
 // GetComments 获取帖子评论
 func (p *Post) GetComments(limit, offset int, order Order) (*dto.PostList, error) {
-	categoryName := "POST_COMMENT"
-	categoryId := strconv.Itoa(p.Id)
-
 	return GetList(
 		p.bdApi,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"POST_COMMENT",
+		strconv.Itoa(p.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

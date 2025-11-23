@@ -122,15 +122,12 @@ func (c *Card) DefaultServer() dto.ServerName {
 
 // GetComments 获取卡牌评论
 func (c *Card) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "CARD_COMMENT"
-	categoryId := strconv.Itoa(c.Id)
-
 	return post.GetList(
 		c.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"CARD_COMMENT",
+		strconv.Itoa(c.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

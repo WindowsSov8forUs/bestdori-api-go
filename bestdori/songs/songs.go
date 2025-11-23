@@ -152,15 +152,12 @@ func (s *Song) GetBGM() (*[]byte, error) {
 
 // GetComments 获取歌曲评论
 func (s *Song) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "SONG_COMMENT"
-	categoryId := strconv.Itoa(s.Id)
-
 	return post.GetList(
 		s.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"SONG_COMMENT",
+		strconv.Itoa(s.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

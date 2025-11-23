@@ -66,15 +66,12 @@ func (m *Mission) DefaultServer() dto.ServerName {
 
 // GetComments 获取任务评论
 func (m *Mission) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "MISSION_COMMENT"
-	categoryId := strconv.Itoa(m.Id)
-
 	return post.GetList(
 		m.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"MISSION_COMMENT",
+		strconv.Itoa(m.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

@@ -74,15 +74,12 @@ func (c *Comic) Type() string {
 
 // GetComments 获取漫画评论
 func (c *Comic) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "COMIC_COMMENT"
-	categoryId := strconv.Itoa(c.Id)
-
 	return post.GetList(
 		c.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"COMIC_COMMENT",
+		strconv.Itoa(c.Id),
+		nil, "",
 		order,
 		limit,
 		offset,

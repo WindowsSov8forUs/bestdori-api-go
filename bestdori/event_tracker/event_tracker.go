@@ -34,15 +34,12 @@ func GetEventTracker(api *uniapi.UniAPI, server dto.Server, event int) *EventTra
 
 // GetComments 获取活动排名追踪评论
 func (et *EventTracker) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "EVENTTRACKER_COMMENT"
-	categoryId := strconv.Itoa(et.Event)
-
 	return post.GetList(
 		et.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"EVENTTRACKER_COMMENT",
+		strconv.Itoa(et.Event),
+		nil, "",
 		order,
 		limit,
 		offset,

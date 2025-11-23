@@ -43,15 +43,12 @@ func GetEventArchive(api *uniapi.UniAPI, id int) (*EventArchive, error) {
 
 // GetComments 获取活动数据评论
 func (ea *EventArchive) GetComments(limit, offset int, order post.Order) (*dto.PostList, error) {
-	categoryName := "EVENTARCHIVE_COMMENT"
-	categoryId := strconv.Itoa(ea.Id)
-
 	return post.GetList(
 		ea.api,
-		nil, nil,
-		&categoryName,
-		&categoryId,
-		nil, nil,
+		"", false,
+		"EVENTARCHIVE_COMMENT",
+		strconv.Itoa(ea.Id),
+		nil, "",
 		order,
 		limit,
 		offset,
