@@ -165,11 +165,11 @@ func (api *UniAPI) buildRequest(params map[string]any, data any, files FilesForm
 
 	// 设置请求体
 	if data != nil {
-		// 清除 data 中的零值字段
+		// 清除 data 中的 nil 字段
 		if m, ok := data.(map[string]any); ok {
 			body := make(map[string]any)
 			for k, v := range m {
-				if !reflect.ValueOf(v).IsZero() {
+				if !reflect.ValueOf(v).IsNil() {
 					body[k] = v
 				}
 			}
