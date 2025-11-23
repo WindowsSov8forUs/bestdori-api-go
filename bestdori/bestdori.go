@@ -65,8 +65,8 @@ func ServerIdToName(serverId dto.Server) (dto.ServerName, error) {
 }
 
 func RemoveURLPrefix(url string) string {
-	if strings.HasPrefix(url, "https://bestdori.com") {
-		return strings.TrimPrefix(url, "https://bestdori.com")
+	if after, ok := strings.CutPrefix(url, "https://bestdori.com"); ok {
+		return after
 	}
 	return url
 }
