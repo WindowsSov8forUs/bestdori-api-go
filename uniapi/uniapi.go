@@ -11,6 +11,12 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
+var logger resty.Logger
+
+func RegisterLogger(l resty.Logger) {
+	logger = l
+}
+
 type FilesFormData map[string]struct {
 	Name   string
 	Reader io.Reader
@@ -58,6 +64,13 @@ func NewAPI(url, proxyURL string, timeout int) *UniAPI {
 		SetProxy(proxyURL).
 		SetTimeout(time.Duration(timeout) * time.Second).
 		SetRetryCount(5)
+
+	if logger != nil {
+		client.SetLogger(logger).
+			SetDebug(true)
+	} else {
+		client.SetDebug(false)
+	}
 
 	// 启用 Cookie Jar
 	jar, _ := cookiejar.New(&cookiejar.Options{

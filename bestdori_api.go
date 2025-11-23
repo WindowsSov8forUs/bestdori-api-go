@@ -5,6 +5,7 @@ import (
 	"github.com/WindowsSov8forUs/bestdori-api-go/ayachan"
 	"github.com/WindowsSov8forUs/bestdori-api-go/bestdori"
 	"github.com/WindowsSov8forUs/bestdori-api-go/uniapi"
+	"github.com/go-resty/resty/v2"
 )
 
 // NewBestdoriAPI creates a new Bestdori API client
@@ -38,4 +39,8 @@ func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {
 	api.OnAfterResponse(ayachan.OnAfterResponseSonolus)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api
+}
+
+func RegisterLogger(l resty.Logger) {
+	uniapi.RegisterLogger(l)
 }
