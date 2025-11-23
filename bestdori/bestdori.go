@@ -111,6 +111,10 @@ func OnAfterResponseBestdori(client *resty.Client, response *resty.Response) err
 			return uniapi.RaiseForStatus(response)
 		}
 
+		if strings.Contains(response.Request.URL, "/api/charts/") {
+			// 特殊地，谱面接口直接返回列表
+			return uniapi.RaiseForStatus(response)
+		}
 		// 解析通用响应体
 		var resp BestdoriAPIResponse
 		if err := json.Unmarshal(response.Body(), &resp); err != nil {
