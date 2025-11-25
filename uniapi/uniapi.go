@@ -59,11 +59,17 @@ type UniAPI struct {
 }
 
 func NewAPI(url, proxyURL string, timeout int) *UniAPI {
+	if timeout <= 0 {
+		timeout = 30
+	}
 	client := resty.New().
 		SetBaseURL(url).
-		SetProxy(proxyURL).
-		SetTimeout(time.Duration(timeout) * time.Second).
-		SetRetryCount(5)
+		SetRetryCount(5).
+		SetTimeout(time.Duration(timeout) * time.Second)
+
+	if proxyURL != "" {
+		client.SetProxy(proxyURL)
+	}
 
 	if logger != nil {
 		client.SetLogger(logger).
