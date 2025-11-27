@@ -5,6 +5,9 @@ import (
 	"io"
 	"net/http/cookiejar"
 	"strconv"
+	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -54,40 +57,46 @@ func (e *NoContentTypeError) Error() string {
 }
 
 type UniAPI struct {
-	baseURL string
-	client  *resty.Client
+	baseURL    string
+	jar        *cookiejar.Jar
+	client     *resty.Client
+	proxyURL   string
+	timeout    time.Duration
+	log        resty.Logger
+	recreateMu sync.Mutex
+	invalid    atomic.Bool
 }
 
 func NewAPI(url, proxyURL string, timeout int) *UniAPI {
 	if timeout <= 0 {
 		timeout = 30
 	}
+	api := &UniAPI{
+		baseURL:  url,
+		proxyURL: proxyURL,
+		timeout:  time.Duration(timeout) * time.Second,
+		log:      logger,
+	}
+	jar, _ := cookiejar.New(&cookiejar.Options{
+		PublicSuffixList: publicsuffix.List,
+	})
+	api.jar = jar
 	client := resty.New().
 		SetBaseURL(url).
 		SetRetryCount(5).
-		SetTimeout(time.Duration(timeout) * time.Second)
-
+		SetTimeout(api.timeout)
 	if proxyURL != "" {
 		client.SetProxy(proxyURL)
 	}
-
 	if logger != nil {
 		client.SetLogger(logger).
 			SetDebug(true)
 	} else {
 		client.SetDebug(false)
 	}
-
-	// 启用 Cookie Jar
-	jar, _ := cookiejar.New(&cookiejar.Options{
-		PublicSuffixList: publicsuffix.List,
-	})
-	client.SetCookieJar(jar)
-
-	return &UniAPI{
-		baseURL: url,
-		client:  client,
-	}
+	client.SetCookieJar(api.jar)
+	api.client = client
+	return api
 }
 
 // SetCookies 从响应中设置 Cookie
@@ -182,45 +191,57 @@ func (api *UniAPI) buildRequest(params map[string]any, data any, files FilesForm
 }
 
 func (api *UniAPI) get(endpoint string, params map[string]any, value any) (*resty.Response, error) {
-	req, err := api.buildRequest(params, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, ok := value.(*[]byte); ok {
-		response, err := req.Get(endpoint)
+	const maxAttempts = 5
+	for attempt := range maxAttempts {
+		if attempt > 0 {
+			time.Sleep(time.Duration(1<<attempt) * time.Second)
+		}
+		if api.invalid.Load() {
+			api.recreateClient()
+		}
+		req, err := api.buildRequest(params, nil, nil)
 		if err != nil {
 			return nil, err
 		}
-		return response, nil
-	} else {
-		response, err := req.SetResult(&value).Get(endpoint)
-		if err != nil {
-			return nil, err
+		var resp *resty.Response
+		var execErr error
+		if _, ok := value.(*[]byte); ok {
+			resp, execErr = req.Get(endpoint)
+		} else {
+			resp, execErr = req.SetResult(value).Get(endpoint)
 		}
-		return response, nil
+		if execErr == nil || !api.shouldRecreate(execErr) || attempt == maxAttempts-1 {
+			return resp, execErr
+		}
+		api.invalid.Store(true)
 	}
+	return nil, fmt.Errorf("get failed after %d attempts with client recreation", maxAttempts)
 }
 
 func (api *UniAPI) post(endpoint string, data any, files FilesFormData, value any) (*resty.Response, error) {
-	req, err := api.buildRequest(nil, data, files)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, ok := value.(*resty.Response); ok {
-		response, err := req.Post(endpoint)
+	const maxAttempts = 2
+	for attempt := range maxAttempts {
+		if api.invalid.Load() {
+			api.recreateClient()
+		}
+		req, err := api.buildRequest(nil, data, files)
 		if err != nil {
 			return nil, err
 		}
-		return response, nil
-	} else {
-		response, err := req.SetResult(&value).Post(endpoint)
-		if err != nil {
-			return nil, err
+		var resp *resty.Response
+		var execErr error
+		hasFiles := len(files) > 0
+		if _, ok := value.(*resty.Response); ok {
+			resp, execErr = req.Post(endpoint)
+		} else {
+			resp, execErr = req.SetResult(value).Post(endpoint)
 		}
-		return response, nil
+		if execErr == nil || !api.shouldRecreate(execErr) || hasFiles || attempt == maxAttempts-1 {
+			return resp, execErr
+		}
+		api.invalid.Store(true)
 	}
+	return nil, fmt.Errorf("post failed after %d attempts with client recreation", maxAttempts)
 }
 
 func Get[T any](api *UniAPI, endpoint string, params map[string]any) (*T, error) {
@@ -243,4 +264,42 @@ func Post[T any](api *UniAPI, endpoint string, data any, files FilesFormData) (*
 		return nil, err
 	}
 	return &result, nil
+}
+
+func (api *UniAPI) shouldRecreate(err error) bool {
+	if err == nil {
+		return false
+	}
+	s := strings.ToLower(err.Error())
+	return strings.Contains(s, "connection") ||
+		strings.Contains(s, "reset by peer") ||
+		strings.Contains(s, "use of closed") ||
+		strings.Contains(s, "broken pipe") ||
+		strings.Contains(s, "eof") ||
+		strings.Contains(s, "timeout") ||
+		strings.Contains(s, "deadline")
+}
+
+func (api *UniAPI) recreateClient() {
+	api.recreateMu.Lock()
+	defer api.recreateMu.Unlock()
+	if !api.invalid.Load() {
+		return
+	}
+	newClient := resty.New().
+		SetBaseURL(api.baseURL).
+		SetRetryCount(0).
+		SetTimeout(api.timeout)
+	if api.proxyURL != "" {
+		newClient.SetProxy(api.proxyURL)
+	}
+	if api.log != nil {
+		newClient.SetLogger(api.log).
+			SetDebug(true)
+	} else {
+		newClient.SetDebug(false)
+	}
+	newClient.SetCookieJar(api.jar)
+	api.client = newClient
+	api.invalid.Store(false)
 }
