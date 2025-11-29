@@ -67,9 +67,12 @@ type UniAPI struct {
 	invalid    atomic.Bool
 }
 
-func NewAPI(url, proxyURL string, timeout int) *UniAPI {
+func NewAPI(url, proxyURL string, timeout, retry int) *UniAPI {
 	if timeout <= 0 {
 		timeout = 30
+	}
+	if retry < 0 {
+		retry = 0
 	}
 	api := &UniAPI{
 		baseURL:  url,
@@ -83,7 +86,7 @@ func NewAPI(url, proxyURL string, timeout int) *UniAPI {
 	api.jar = jar
 	client := resty.New().
 		SetBaseURL(url).
-		SetRetryCount(5).
+		SetRetryCount(retry).
 		SetTimeout(api.timeout)
 	if proxyURL != "" {
 		client.SetProxy(proxyURL)

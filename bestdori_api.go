@@ -9,8 +9,8 @@ import (
 )
 
 // NewBestdoriAPI creates a new Bestdori API client
-func NewBestdoriAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://bestdori.com", proxyURL, timeout)
+func NewBestdoriAPI(proxyURL string, timeout, retry int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://bestdori.com", proxyURL, timeout, retry)
 	api.OnBeforeRequest(bestdori.OnBeforeRequestBestdori)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	api.OnAfterResponse(bestdori.OnAfterResponseBestdori)
@@ -18,24 +18,24 @@ func NewBestdoriAPI(proxyURL string, timeout int) *uniapi.UniAPI {
 }
 
 // NewNiconiAPI creates a new Niconi API client
-func NewNiconiAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://card.niconi.co.ni", proxyURL, timeout)
+func NewNiconiAPI(proxyURL string, timeout, retry int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://card.niconi.co.ni", proxyURL, timeout, retry)
 	api.OnAfterResponse(bestdori.OnAfterResponseNiconi)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api
 }
 
 // NewAyachanAPI creates a new Ayachan API client
-func NewAyachanAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://api.ayachan.fun/v2", proxyURL, timeout)
+func NewAyachanAPI(proxyURL string, timeout, retry int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://api.ayachan.fun/v2", proxyURL, timeout, retry)
 	api.OnAfterResponse(ayachan.OnAfterResponseAyachan)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api
 }
 
 // NewSonolusAPI creates a new Sonolus API client
-func NewSonolusAPI(proxyURL string, timeout int) *uniapi.UniAPI {
-	api := uniapi.NewAPI("https://sonolus.ayachan.fun/test/sonolus", proxyURL, timeout)
+func NewSonolusAPI(proxyURL string, timeout, retry int) *uniapi.UniAPI {
+	api := uniapi.NewAPI("https://sonolus.ayachan.fun/test/sonolus", proxyURL, timeout, retry)
 	api.OnAfterResponse(ayachan.OnAfterResponseSonolus)
 	api.OnAfterResponse(api.ContentTypeMiddleware())
 	return api
